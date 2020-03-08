@@ -1,0 +1,17 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto&display=swap");
+
+body {
+  overflow: hidden;
+  font-family: "Roboto", sans-serif;
+}
+
+#errorMessage {
+  color: red;
+}
+
+#noteText {
+  color: grey;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 10px;
+}

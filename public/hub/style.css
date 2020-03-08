@@ -1,0 +1,52 @@
+@import url("https://fonts.googleapis.com/css?family=Lato|Roboto&display=swap");
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  overflow: hidden;
+  font-family: "Roboto", sans-serif;
+}
+
+#textToSend {
+  resize: none;
+  width: 40%;
+}
+
+#messagesHolder {
+  border: black 2px solid;
+  width: 40%;
+  height: 60%;
+  overflow-y: scroll;
+  word-wrap: break-word;
+}
+
+#errorMessage {
+  color: red;
+}
+
+.rootElement {
+  margin: 10px;
+  border-radius: 25px;
+  background-color: chartreuse;
+  width: 90%;
+  padding-bottom: 8px;
+  padding-top: 5px;
+}
+
+.userElement {
+  margin: 5px;
+  margin-left: 10px;
+  font-size: large;
+  max-width: 90%;
+}
+
+.textElement {
+  width: 90%;
+  margin: 5px;
+  margin-left: 10px;
+  font-family: "Lato", sans-serif;
+}

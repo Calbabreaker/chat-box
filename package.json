@@ -1,0 +1,22 @@
+{
+  "name": "chatbox",
+  "version": "1.0.0",
+  "description": "Simple Chatbox built in node",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "chatbox",
+    "test"
+  ],
+  "author": "Calbabreaker",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-rate-limit": "^5.1.1",
+    "http": "0.0.0",
+    "nedb": "^1.8.0",
+    "uuid": "^7.0.2"
+  }
+}
