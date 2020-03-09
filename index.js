@@ -39,22 +39,27 @@ app.get("/app/messages/:session_id", async (request, response) => {
   const data = request.params.session_id;
 
   if (typeof data === "string") {
-    const result = await checkPropertyInUsers({
-      sessionId: data
-    }).catch(err => response.status(400).send(err));
-    if (result.status === "Found") {
-      messagesDatabase
-        .find({})
-        .sort({ timestamp: 1 })
-        .exec((err, data) => {
-          if (err) {
-            return response.status(400).send(err);
-          } else {
-            return response.json(data);
-          }
-        });
-    } else {
-      return response.status(401).send("ERROR: INVALID SESSION ID");
+    try {
+      const result = await checkPropertyInUsers({
+        sessionId: data
+      });
+      if (result.status === "Found") {
+        messagesDatabase
+          .find({})
+          .sort({ timestamp: 1 })
+          .exec((err, data) => {
+            if (err) {
+              return response.status(400).send(err);
+            } else {
+              return response.json(data);
+            }
+          });
+      } else {
+        return response.status(401).send("ERROR: INVALID SESSION ID");
+      }
+    } catch (err) {
+      console.log(err);
+      return response.status(400).send(err);
     }
   }
 });
@@ -62,14 +67,19 @@ app.get("/app/messages/:session_id", async (request, response) => {
 app.get("/app/check_session_id/:session_id", async (request, response) => {
   const data = request.params.session_id;
   if (typeof data === "string") {
-    const result = await checkPropertyInUsers({
-      sessionId: data
-    }).catch(err => response.status(400).send(err));
+    try {
+      const result = await checkPropertyInUsers({
+        sessionId: data
+      });
 
-    return response.json({
-      data: data,
-      valid: result.status === "Found" ? true : false
-    });
+      return response.json({
+        data: data,
+        valid: result.status === "Found" ? true : false
+      });
+    } catch (err) {
+      console.log(err);
+      return response.status(400).send(err);
+    }
   }
 
   return response.status(400).send("ERROR: INVALID PROPERTY: SESSION ID");
@@ -79,25 +89,29 @@ app.post("/app/send", async (request, response) => {
   const data = request.body;
   const timestamp = Date.now();
   if (typeof data.text === "string") {
-    const result = await checkPropertyInUsers({
-      sessionId: data.sessionId
-    }).catch(err => response.status(400).send(err));
+    try {
+      const result = await checkPropertyInUsers({
+        sessionId: data.sessionId
+      });
 
-    if (result.status == "NotFound") {
-      return response.status(401).send("ERROR: INVALID SESSION ID");
-    }
+      if (result.status == "NotFound") {
+        return response.status(401).send("ERROR: INVALID SESSION ID");
+      }
 
-    console.log(result);
-    const doc = result.doc;
-    const dataToInsert = {
-      nickname: doc.nickname, //find username with session id then insert to database
-      text: data.text,
-      timestamp: timestamp
-    };
+      const doc = result.doc;
+      const dataToInsert = {
+        nickname: doc.nickname, //find username with session id then insert to database
+        text: data.text,
+        timestamp: timestamp
+      };
 
-    if (dataToInsert.text.replace(/\s/g, "").length) {
-      messagesDatabase.insert(dataToInsert);
-      return response.json(dataToInsert);
+      if (dataToInsert.text.replace(/\s/g, "").length) {
+        messagesDatabase.insert(dataToInsert);
+        return response.json(dataToInsert);
+      }
+    } catch (err) {
+      console.log(err);
+      return response.status(400).send(err);
     }
   }
 
@@ -105,27 +119,34 @@ app.post("/app/send", async (request, response) => {
 });
 
 app.post("/app/users", async (request, response) => {
+  //create users and their unique secret session id
   const data = request.body;
   const timestamp = Date.now();
   if (typeof data.nickname === "string") {
     console.log(data.nickname);
-    const result = await checkPropertyInUsers({
-      nickname: data.nickname
-    }).catch(err => response.status(400).send(err));
+    try {
+      const result = await checkPropertyInUsers({
+        nickname: data.nickname
+      });
 
-    if (result.status == "Found") {
-      return response.status(422).send("ERROR: NICKNAME TAKEN");
-    } else {
-      const userData = {
-        nickname: data.nickname,
-        sessionId: uuid.v4(),
-        created: timestamp
-      };
+      if (result.status == "Found") {
+        return response.status(422).send("ERROR: NICKNAME TAKEN");
+      } else {
+        const sessionId = await createUniqueSessionId();
+        const userData = {
+          nickname: data.nickname,
+          sessionId: sessionId,
+          created: timestamp
+        };
 
-      if (userData.nickname.replace(/\s/g, "").length) {
-        usersDatabase.insert(userData);
-        return response.json(userData);
+        if (userData.nickname.replace(/\s/g, "").length) {
+          usersDatabase.insert(userData);
+          return response.json(userData);
+        }
       }
+    } catch (err) {
+      console.log(err);
+      return response.status(400).send(err);
     }
   }
 
@@ -137,12 +158,41 @@ app.use((request, response, next) => {
   console.log(request.url);
 });
 
+function checkUsersExpire() {
+  const currentTimestamp = Date.now();
+  //remove users that are more than 10 days old
+  usersDatabase.remove(
+    { created: { $gt: currentTimestamp + 10 * 24 * 60 * 60 * 1000 } },
+    (err, doc) => {
+      if (err) {
+        return response.status(400).send(err);
+      }
+    }
+  );
+}
+
+function createUniqueSessionId() {
+  return new Promise(async (resolve, reject) => {
+    for (let i = 0; i < 100; i++) {
+      const sessionId = uuid.v4();
+      const result = await checkPropertyInUsers({
+        sessionId: sessionId
+      }).catch(reject);
+
+      if (result.status == "NotFound") {
+        return resolve(sessionId);
+      }
+    }
+
+    reject("ERROR: FAILED TO GENERATE SESSION ID AFTER 100 TRIES");
+  });
+}
+
 function checkPropertyInUsers(property) {
   return new Promise((resolve, reject) => {
     usersDatabase.findOne(property, (err, doc) => {
       if (err) {
         reject(err);
-        console.log(err);
       } else if (doc != null) {
         resolve({ status: "Found", doc: doc });
       } else {
@@ -151,3 +201,6 @@ function checkPropertyInUsers(property) {
     });
   });
 }
+
+checkUsersExpire();
+setInterval(checkUsersExpire, 60 * 60 * 1000);
