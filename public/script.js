@@ -3,7 +3,7 @@ let errorMessageTimeout;
 
 async function trySend(options) {
   return new Promise(async (resolve, reject) => {
-    const response = await fetch("/app/users", options);
+    const response = await fetch("/app/user/create", options);
     if (response.status.toString()[0] == "4") {
       //too many requests
       if (response.status === 422) {

@@ -2,6 +2,7 @@ const messagesHolder = document.getElementById("messagesHolder");
 const textToSendArea = document.getElementById("textToSend");
 
 let errorMessageTimeout;
+let nickname;
 
 class message {
   constructor(user, text, timestamp) {
@@ -67,6 +68,18 @@ async function sendToServer() {
   }
 }
 
+async function quit() {
+  const canQuit = confirm(
+    `This WILL delete your nickname '${nickname}' and let others use it for maxium 10 days.`
+  );
+
+  if (canQuit) {
+    await fetch("/app/user/quit").catch(console.error);
+    localStorage.setItem("sessionId", null);
+    location.href = "/";
+  }
+}
+
 async function loadMessages() {
   const sessionId = localStorage.getItem("sessionId");
   const response = await fetch("/app/messages/" + sessionId);
@@ -99,6 +112,10 @@ async function redirectIfInvalidSessionId() {
   const data = await response.json();
   if (!data.valid) {
     location.href = "/";
+  } else {
+    const welcomeTextbox = document.getElementById("welcomeText");
+    nickname = data.userData.nickname;
+    welcomeTextbox.textContent = `Welcome ${nickname}! start typing in chat.`;
   }
 }
 

@@ -28,6 +28,13 @@ body {
   color: red;
 }
 
+#welcomeText {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: grey;
+}
+
 .rootElement {
   margin: 10px;
   border-radius: 25px;

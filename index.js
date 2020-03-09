@@ -73,8 +73,9 @@ app.get("/app/check_session_id/:session_id", async (request, response) => {
       });
 
       return response.json({
-        data: data,
-        valid: result.status === "Found" ? true : false
+        dataSent: data,
+        valid: result.status === "Found" ? true : false,
+        userData: result.doc
       });
     } catch (err) {
       console.log(err);
@@ -118,36 +119,54 @@ app.post("/app/send", async (request, response) => {
   return response.status(400).send("ERROR: INVALID PROPERTY: TEXT");
 });
 
-app.post("/app/users", async (request, response) => {
-  //create users and their unique secret session id
+app.post("/app/user/:type", async (request, response) => {
   const data = request.body;
+  const typeOfRequest = request.params.type;
   const timestamp = Date.now();
-  if (typeof data.nickname === "string") {
-    console.log(data.nickname);
-    try {
-      const result = await checkPropertyInUsers({
-        nickname: data.nickname
-      });
+  try {
+    // when the user creates a new nickname
+    if (typeOfRequest == "create") {
+      if (typeof data.nickname === "string") {
+        console.log(data.nickname);
+        const result = await checkPropertyInUsers({
+          nickname: data.nickname
+        });
 
-      if (result.status == "Found") {
-        return response.status(422).send("ERROR: NICKNAME TAKEN");
-      } else {
-        const sessionId = await createUniqueSessionId();
-        const userData = {
-          nickname: data.nickname,
-          sessionId: sessionId,
-          created: timestamp
-        };
+        if (result.status == "Found") {
+          return response.status(422).send("ERROR: NICKNAME TAKEN");
+        } else {
+          const sessionId = await createUniqueSessionId();
+          const userData = {
+            nickname: data.nickname,
+            sessionId: sessionId,
+            created: timestamp
+          };
 
-        if (userData.nickname.replace(/\s/g, "").length) {
-          usersDatabase.insert(userData);
-          return response.json(userData);
+          if (userData.nickname.replace(/\s/g, "").length) {
+            usersDatabase.insert(userData);
+            return response.json(userData);
+          }
         }
       }
-    } catch (err) {
-      console.log(err);
-      return response.status(400).send(err);
+
+      // when the user quits
+    } else if (typeOfRequest == "quit") {
+      const result = await removeByPropertyInUsers({
+        sessionId: data.sessionId
+      });
+
+      if (result.status == "Fail") {
+        return response.status(422).send("ERROR: INVALID SESSION ID");
+      } else {
+        return response.json({ status: status });
+      }
+    } else {
+      // prettier-ignore
+      return response.status(404).sendFile(__dirname + "/public/static/404error.html");
     }
+  } catch (err) {
+    console.log(err);
+    return response.status(400).send(err);
   }
 
   return response.status(400).send("ERROR: INVALID PROPERTY: NICKNAME");
@@ -197,6 +216,20 @@ function checkPropertyInUsers(property) {
         resolve({ status: "Found", doc: doc });
       } else {
         resolve({ status: "NotFound", doc: doc });
+      }
+    });
+  });
+}
+
+function removeByPropertyInUsers(property) {
+  return new Promise((resolve, reject) => {
+    usersDatabase.remove(property, (err, doc) => {
+      if (err) {
+        reject(err);
+      } else if (doc != null) {
+        resolve({ status: "Sucess" });
+      } else {
+        resolve({ status: "Fail" });
       }
     });
   });
