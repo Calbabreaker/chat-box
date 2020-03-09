@@ -74,7 +74,19 @@ async function quit() {
   );
 
   if (canQuit) {
-    await fetch("/app/user/quit").catch(console.error);
+    const data = {
+      sessionId: localStorage.getItem("sessionId")
+    };
+
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    };
+
+    await fetch("/app/user/quit", options).catch(console.error);
     localStorage.setItem("sessionId", null);
     location.href = "/";
   }

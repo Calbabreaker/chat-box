@@ -1,7 +1,7 @@
 const express = require("express");
 const datastore = require("nedb");
 const rateLimit = require("express-rate-limit");
-const uuid = require("uuid");
+const functions = require("./functions");
 
 const app = express();
 const messagesDatabase = new datastore("messages.dat");
@@ -40,9 +40,12 @@ app.get("/app/messages/:session_id", async (request, response) => {
 
   if (typeof data === "string") {
     try {
-      const result = await checkPropertyInUsers({
-        sessionId: data
-      });
+      const result = await functions.checkPropertyInDatabase(
+        {
+          sessionId: data
+        },
+        usersDatabase
+      );
       if (result.status === "Found") {
         messagesDatabase
           .find({})
@@ -68,9 +71,12 @@ app.get("/app/check_session_id/:session_id", async (request, response) => {
   const data = request.params.session_id;
   if (typeof data === "string") {
     try {
-      const result = await checkPropertyInUsers({
-        sessionId: data
-      });
+      const result = await functions.checkPropertyInDatabase(
+        {
+          sessionId: data
+        },
+        usersDatabase
+      );
 
       return response.json({
         dataSent: data,
@@ -91,9 +97,12 @@ app.post("/app/send", async (request, response) => {
   const timestamp = Date.now();
   if (typeof data.text === "string") {
     try {
-      const result = await checkPropertyInUsers({
-        sessionId: data.sessionId
-      });
+      const result = await functions.checkPropertyInDatabase(
+        {
+          sessionId: data.sessionId
+        },
+        usersDatabase
+      );
 
       if (result.status == "NotFound") {
         return response.status(401).send("ERROR: INVALID SESSION ID");
@@ -128,14 +137,17 @@ app.post("/app/user/:type", async (request, response) => {
     if (typeOfRequest == "create") {
       if (typeof data.nickname === "string") {
         console.log(data.nickname);
-        const result = await checkPropertyInUsers({
-          nickname: data.nickname
-        });
+        const result = await functions.checkPropertyInDatabase(
+          {
+            nickname: data.nickname
+          },
+          usersDatabase
+        );
 
         if (result.status == "Found") {
           return response.status(422).send("ERROR: NICKNAME TAKEN");
         } else {
-          const sessionId = await createUniqueSessionId();
+          const sessionId = await functions.createUniqueSessionId();
           const userData = {
             nickname: data.nickname,
             sessionId: sessionId,
@@ -151,14 +163,17 @@ app.post("/app/user/:type", async (request, response) => {
 
       // when the user quits
     } else if (typeOfRequest == "quit") {
-      const result = await removeByPropertyInUsers({
-        sessionId: data.sessionId
-      });
+      const result = await functions.removeByPropertyInDatabase(
+        {
+          sessionId: data.sessionId
+        },
+        usersDatabase
+      );
 
       if (result.status == "Fail") {
         return response.status(422).send("ERROR: INVALID SESSION ID");
       } else {
-        return response.json({ status: status });
+        return response.json({ status: result.status });
       }
     } else {
       // prettier-ignore
@@ -174,66 +189,7 @@ app.post("/app/user/:type", async (request, response) => {
 
 app.use((request, response, next) => {
   response.status(404).sendFile(__dirname + "/public/static/404error.html");
-  console.log(request.url);
+  console.log("NOTFOUND: " + request.url);
 });
 
-function checkUsersExpire() {
-  const currentTimestamp = Date.now();
-  //remove users that are more than 10 days old
-  usersDatabase.remove(
-    { created: { $gt: currentTimestamp + 10 * 24 * 60 * 60 * 1000 } },
-    (err, doc) => {
-      if (err) {
-        return response.status(400).send(err);
-      }
-    }
-  );
-}
-
-function createUniqueSessionId() {
-  return new Promise(async (resolve, reject) => {
-    for (let i = 0; i < 100; i++) {
-      const sessionId = uuid.v4();
-      const result = await checkPropertyInUsers({
-        sessionId: sessionId
-      }).catch(reject);
-
-      if (result.status == "NotFound") {
-        return resolve(sessionId);
-      }
-    }
-
-    reject("ERROR: FAILED TO GENERATE SESSION ID AFTER 100 TRIES");
-  });
-}
-
-function checkPropertyInUsers(property) {
-  return new Promise((resolve, reject) => {
-    usersDatabase.findOne(property, (err, doc) => {
-      if (err) {
-        reject(err);
-      } else if (doc != null) {
-        resolve({ status: "Found", doc: doc });
-      } else {
-        resolve({ status: "NotFound", doc: doc });
-      }
-    });
-  });
-}
-
-function removeByPropertyInUsers(property) {
-  return new Promise((resolve, reject) => {
-    usersDatabase.remove(property, (err, doc) => {
-      if (err) {
-        reject(err);
-      } else if (doc != null) {
-        resolve({ status: "Sucess" });
-      } else {
-        resolve({ status: "Fail" });
-      }
-    });
-  });
-}
-
-checkUsersExpire();
-setInterval(checkUsersExpire, 60 * 60 * 1000);
+functions.nonExpressSetup(usersDatabase);
