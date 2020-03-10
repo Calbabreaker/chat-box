@@ -1,6 +1,20 @@
+const datastore = require("nedb");
 const uuid = require("uuid");
 
+let messagesDatabase;
 let usersDatabase;
+
+module.exports.init = () => {
+  messagesDatabase = new datastore("messages.dat");
+  usersDatabase = new datastore("users.dat");
+  messagesDatabase.loadDatabase();
+  usersDatabase.loadDatabase();
+  module.exports.messagesDatabase = messagesDatabase;
+  module.exports.usersDatabase = usersDatabase;
+
+  module.exports.checkUsersExpire();
+  setInterval(module.exports.checkUsersExpire, 60 * 60 * 1000);
+};
 
 module.exports.checkUsersExpire = () => {
   const currentTimestamp = Date.now();
@@ -21,7 +35,7 @@ module.exports.createUniqueSessionId = () => {
   return new Promise(async (resolve, reject) => {
     for (let i = 0; i < 100; i++) {
       const sessionId = uuid.v4();
-      const result = await module.exports
+      const result = await exports
         .checkPropertyInDatabase(
           {
             sessionId: sessionId
@@ -65,10 +79,4 @@ module.exports.removeByPropertyInDatabase = (property, database) => {
       }
     });
   });
-};
-
-module.exports.nonExpressSetup = usersDatabaseRef => {
-  usersDatabase = usersDatabaseRef;
-  module.exports.checkUsersExpire();
-  setInterval(module.exports.checkUsersExpire, 60 * 60 * 1000);
 };

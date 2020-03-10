@@ -28,18 +28,15 @@ class message {
 async function trySend(options) {
   return new Promise(async (resolve, reject) => {
     const response = await fetch("/app/send", options);
+    const text = await response.text();
     if (response.status.toString()[0] == "4") {
       //too many requests
       if (response.status === 429) {
-        setErrorMessage(
-          "Your sending messages to fast! (blocked sending messages for a short amount of time)"
-        );
+        setErrorMessage("Your sending messages to fast! (blocked sending messages for a short amount of time)");
         reject("TOO MANY REQUESTS ERROR 429");
       } else {
-        setErrorMessage(
-          `There was a promblem sending your message! (${response.status} error)`
-        );
-        reject(`${response.status} ERROR`);
+        setErrorMessage(`There was a promblem sending your message! (${response.status} error)`);
+        reject(`${response.status} ERROR, ${text}`);
       }
     } else {
       resolve(response);
@@ -69,9 +66,7 @@ async function sendToServer() {
 }
 
 async function quit() {
-  const canQuit = confirm(
-    `This WILL delete your nickname '${nickname}' and let others use it for maxium 10 days.`
-  );
+  const canQuit = confirm(`This WILL delete your nickname '${nickname}' and let others use it for maxium 10 days.`);
 
   if (canQuit) {
     const data = {
@@ -86,7 +81,7 @@ async function quit() {
       body: JSON.stringify(data)
     };
 
-    await fetch("/app/user/quit", options).catch(console.error);
+    await fetch("/app/users/quit", options).catch(console.error);
     localStorage.setItem("sessionId", null);
     location.href = "/";
   }
@@ -97,8 +92,7 @@ async function loadMessages() {
   const response = await fetch("/app/messages/" + sessionId);
   const data = await response.json();
 
-  let shouldScrollToBottom =
-    messagesHolder.scrollTop >= messagesHolder.scrollHeight - 400;
+  let shouldScrollToBottom = messagesHolder.scrollTop >= messagesHolder.scrollHeight - 400;
   messagesHolder.textContent = "";
   data.forEach(item => {
     new message(item.nickname, item.text, item.timestamp);
@@ -132,9 +126,7 @@ async function redirectIfInvalidSessionId() {
 }
 
 function startEverything() {
-  loadMessages().then(
-    () => (messagesHolder.scrollTop = messagesHolder.scrollHeight)
-  );
+  loadMessages().then(() => (messagesHolder.scrollTop = messagesHolder.scrollHeight));
   let loadMessagesInterval = setInterval(() => {
     loadMessages().catch(err => {
       console.error(err), clearInterval(loadMessagesInterval);

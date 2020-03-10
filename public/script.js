@@ -3,18 +3,16 @@ let errorMessageTimeout;
 
 async function trySend(options) {
   return new Promise(async (resolve, reject) => {
-    const response = await fetch("/app/user/create", options);
+    const response = await fetch("/app/users/create", options);
     if (response.status.toString()[0] == "4") {
       //too many requests
       if (response.status === 422) {
-        setErrorMessage(
-          "Nickname currently being used by another user! Please choose another one."
-        );
+        setErrorMessage("Nickname currently being used by another user! Please choose another one.");
         reject("TAKEN ERROR 422");
+      } else if (response.status == 429) {
+        setErrorMessage("Your joining too fast too many times! (blocked joining for a while)");
       } else {
-        setErrorMessage(
-          `There was a problem joining! (${response.status} error)`
-        );
+        setErrorMessage(`There was a problem joining! (${response.status} error)`);
         reject(`${response.status} ERROR`);
       }
     } else {
