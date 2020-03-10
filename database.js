@@ -5,7 +5,7 @@ let messagesDatabase;
 let usersDatabase;
 
 module.exports.init = () => {
-  messagesDatabase = new datastore("messages.dat");
+  messagesDatabase = new datastore("chatHistory.dat");
   usersDatabase = new datastore("users.dat");
   messagesDatabase.loadDatabase();
   usersDatabase.loadDatabase();
@@ -20,15 +20,11 @@ module.exports.checkUsersExpire = () => {
   const currentTimestamp = Date.now();
   console.log("Check and deleting...");
   //remove users that are more than 10 days old
-  usersDatabase.remove(
-    { created: { $lt: currentTimestamp - 10 * 24 * 60 * 60 * 1000 } },
-    { multi: true },
-    (err, doc) => {
-      if (err) {
-        return response.status(400).send(err);
-      }
+  usersDatabase.remove({ created: { $lt: currentTimestamp - 10 * 24 * 60 * 60 * 1000 } }, { multi: true }, (err, doc) => {
+    if (err) {
+      return response.status(400).send(err);
     }
-  );
+  });
 };
 
 module.exports.createUniqueSessionId = () => {
