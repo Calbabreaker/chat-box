@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => console.log("Server Running..."));
 app.use(express.static("public"));
-app.use("/static", express.static("public/static"));
+app.use("/static", express.static("static"));
 app.use(express.json({ limit: "1kb" }));
 
 const sendLimiter = rateLimit({
