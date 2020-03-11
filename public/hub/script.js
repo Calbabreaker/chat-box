@@ -153,7 +153,7 @@ function startEverything() {
     loadMessages().catch(err => {
       console.error(err), clearInterval(loadMessagesInterval);
     });
-  }, 500);
+  }, 1000);
 
   textToSendArea.addEventListener("keydown", event => {
     if (event.key == "Enter") {
