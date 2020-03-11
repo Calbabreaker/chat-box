@@ -77,9 +77,10 @@ async function sendToServer() {
       body: JSON.stringify(data)
     };
 
-    await Promise.all([trySend(options), loadMessages()]).catch(console.error);
-    messagesHolder.scrollTop = messagesHolder.scrollHeight;
     textToSendArea.value = "";
+    await trySend(options).catch(console.error);
+    await loadMessages();
+    messagesHolder.scrollTop = messagesHolder.scrollHeight;
   }
 }
 
