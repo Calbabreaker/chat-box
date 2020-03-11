@@ -4,7 +4,7 @@ const textToSendArea = document.getElementById("textToSend");
 let errorMessageTimeout;
 let nickname;
 
-class message {
+class Message {
   constructor(user, text, timestamp) {
     this.user = user;
     this.text = text;
@@ -15,12 +15,30 @@ class message {
     const textElement = document.createElement("div");
 
     rootElement.className = "rootElement";
+    rootElement.style.textAlign = nickname === user ? "left" : "right";
     userElement.textContent = user;
     userElement.className = "userElement";
     textElement.textContent = text;
     textElement.className = "textElement";
 
     rootElement.append(userElement, textElement);
+    messagesHolder.append(rootElement);
+  }
+}
+
+class Status {
+  constructor(text, timestamp) {
+    this.text = text;
+    this.timestamp = timestamp;
+
+    const rootElement = document.createElement("div");
+    const textElement = document.createElement("div");
+
+    rootElement.className = "rootElement";
+    textElement.textContent = text;
+    textElement.className = "textElement";
+
+    rootElement.append(textElement);
     messagesHolder.append(rootElement);
   }
 }
@@ -95,7 +113,11 @@ async function loadMessages() {
   let shouldScrollToBottom = messagesHolder.scrollTop >= messagesHolder.scrollHeight - 400;
   messagesHolder.textContent = "";
   data.forEach(item => {
-    new message(item.nickname, item.text, item.timestamp);
+    if (item.type == "message") {
+      new Message(item.nickname, item.text, item.timestamp);
+    } else if (item.type == "status") {
+      new Status(item.text, item.timestamp);
+    }
   });
 
   if (shouldScrollToBottom) {

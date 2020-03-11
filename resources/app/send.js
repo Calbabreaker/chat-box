@@ -19,6 +19,7 @@ module.exports = async (request, response) => {
 
     const doc = result.doc;
     const dataToInsert = {
+      type: "message",
       nickname: doc.nickname, //find username with session id then insert to database
       text: data.text,
       timestamp: timestamp

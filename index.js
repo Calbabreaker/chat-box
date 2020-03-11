@@ -22,7 +22,6 @@ fs.readdirSync(normalizedPath).forEach(file => {
 
 app.listen(PORT, () => console.log("Server Running..."));
 app.use(express.static("public"));
-app.use("/static", express.static("static"));
 app.use(express.json({ limit: "1kb" }));
 
 //setup limiters
@@ -40,6 +39,6 @@ app.post("/app/users/:type", app.run.users);
 
 //not found error and send 404 html file
 app.use((request, response, next) => {
-  response.status(404).sendFile(__dirname + "/public/static/404error.html");
+  response.status(404).sendFile(__dirname + "/static/404error.html");
   console.log("NOTFOUND: " + request.url);
 });

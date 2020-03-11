@@ -29,6 +29,13 @@ module.exports = async (request, response) => {
           created: timestamp
         };
 
+        const messageData = {
+          type: "status",
+          text: `${data.nickname} has joined the chat.`,
+          timestamp: timestamp
+        };
+
+        database.messagesDatabase.insert(messageData);
         database.usersDatabase.insert(userData);
         return response.json(userData);
       }
@@ -38,21 +45,35 @@ module.exports = async (request, response) => {
       if (!typeof data.sessionId === "string") return response.status(400).send("ERROR: INVALID SESSION ID ONLY STRING");
       if (!data.sessionId.replace(/\s/g, "").length) return response.status(400).send("ERROR: INVALID SESSION ID ONLY SPACES");
 
-      const result = await database.removeByPropertyInDatabase(
+      const result = await database.checkPropertyInDatabase(
         {
           sessionId: data.sessionId
         },
         database.usersDatabase
       );
 
+      const messageData = {
+        type: "status",
+        text: `${result.doc.nickname} has left the chat.`,
+        timestamp: timestamp
+      };
+
       if (result.status == "Fail") {
         return response.status(401).send("ERROR: INVALID SESSION ID");
       } else {
+        database.removeByPropertyInDatabase(
+          {
+            sessionId: data.sessionId
+          },
+          database.usersDatabase
+        );
+
+        database.messagesDatabase.insert(messageData);
         return response.json({ status: result.status });
       }
     } else {
       // prettier-ignore
-      return response.status(404).sendFile(__dirname + "/public/static/404error.html");
+      return response.status(404).sendFile(global.rootDir + "/static/404error.html");
     }
   } catch (err) {
     console.log(err);

@@ -38,7 +38,7 @@ body {
 .rootElement {
   margin: 10px;
   border-radius: 25px;
-  background-color: chartreuse;
+  background-color: rgb(207, 207, 207);
   width: 90%;
   padding-bottom: 8px;
   padding-top: 5px;
