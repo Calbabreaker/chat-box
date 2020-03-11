@@ -107,8 +107,7 @@ async function quit() {
 }
 
 async function loadMessages() {
-  const sessionId = localStorage.getItem("sessionId");
-  const response = await fetch("/app/messages/" + sessionId);
+  const response = await fetch("/app/messages");
   const data = await response.json();
 
   let shouldScrollToBottom = messagesHolder.scrollTop >= messagesHolder.scrollHeight - 400;

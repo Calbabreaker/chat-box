@@ -31,7 +31,7 @@ app.use("/app/messages", limiters.messagesLimiter);
 
 //get requests
 app.get("/app/check_session_id/:session_id", app.run.checkSessionId);
-app.get("/app/messages/:session_id", app.run.messages);
+app.get("/app/messages", app.run.messages);
 
 //post requests
 app.post("/app/send", app.run.send);
