@@ -14,11 +14,12 @@ body {
 #textToSend {
   resize: none;
   width: 40%;
+  width: 400px;
 }
 
 #messagesHolder {
   border: black 2px solid;
-  width: 40%;
+  width: 400px;
   height: 60%;
   overflow-y: scroll;
   word-wrap: break-word;
