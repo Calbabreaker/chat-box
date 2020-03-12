@@ -29,10 +29,12 @@ module.exports = async (request, response) => {
           created: timestamp
         };
 
+        const count = await database.getDatabaseCount(database.messagesDatabase);
         const messageData = {
           type: "status",
           text: `${data.nickname} has joined the chat.`,
-          timestamp: timestamp
+          timestamp: timestamp,
+          count: count
         };
 
         database.messagesDatabase.insert(messageData);
@@ -52,10 +54,12 @@ module.exports = async (request, response) => {
         database.usersDatabase
       );
 
+      const count = await database.getDatabaseCount(database.messagesDatabase);
       const messageData = {
         type: "status",
         text: `${result.doc.nickname} has left the chat.`,
-        timestamp: timestamp
+        timestamp: timestamp,
+        count: count
       };
 
       if (result.status == "Fail") {

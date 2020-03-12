@@ -1,14 +1,17 @@
 const messagesHolder = document.getElementById("messagesHolder");
 const textToSendArea = document.getElementById("textToSend");
+const loadingText = document.getElementById("loadingText");
 
 let errorMessageTimeout;
 let nickname;
+let messages = [];
 
 class Message {
-  constructor(user, text, timestamp) {
+  constructor(user, text, timestamp, count, top) {
     this.user = user;
     this.text = text;
     this.timestamp = timestamp;
+    this.count = count;
 
     const rootElement = document.createElement("div");
     const userElement = document.createElement("h1");
@@ -20,16 +23,22 @@ class Message {
     userElement.className = "userElement";
     textElement.textContent = text;
     textElement.className = "textElement";
+    this.rootElement = rootElement;
 
     rootElement.append(userElement, textElement);
-    messagesHolder.append(rootElement);
+    if (!top) {
+      messagesHolder.append(rootElement);
+    } else {
+      messagesHolder.insertBefore(rootElement, messages[0].rootElement);
+    }
   }
 }
 
 class Status {
-  constructor(text, timestamp) {
+  constructor(text, timestamp, count, top) {
     this.text = text;
     this.timestamp = timestamp;
+    this.count = count;
 
     const rootElement = document.createElement("div");
     const textElement = document.createElement("div");
@@ -40,6 +49,11 @@ class Status {
 
     rootElement.append(textElement);
     messagesHolder.append(rootElement);
+    if (!top) {
+      messagesHolder.append(rootElement);
+    } else {
+      messagesHolder.insertBefore(rootElement, messages[0].rootElement);
+    }
   }
 }
 
@@ -79,7 +93,7 @@ async function sendToServer() {
 
     textToSendArea.value = "";
     await trySend(options).catch(console.error);
-    await loadMessages();
+    await loadMessages(getParamToPut());
     messagesHolder.scrollTop = messagesHolder.scrollHeight;
   }
 }
@@ -106,22 +120,43 @@ async function quit() {
   }
 }
 
-async function loadMessages() {
-  const response = await fetch("/app/messages");
+async function loadMessages(parameter) {
+  const response = await fetch("/app/messages/" + parameter);
   const data = await response.json();
 
-  let shouldScrollToBottom = messagesHolder.scrollTop >= messagesHolder.scrollHeight - 400;
-  messagesHolder.textContent = "";
+  let shouldScrollToBottom = messagesHolder.scrollTop + messagesHolder.offsetHeight >= messagesHolder.scrollHeight;
   data.forEach(item => {
     if (item.type == "message") {
-      new Message(item.nickname, item.text, item.timestamp);
+      messages.push(new Message(item.nickname, item.text, item.timestamp, item.count, false));
     } else if (item.type == "status") {
-      new Status(item.text, item.timestamp);
+      messages.push(new Status(item.text, item.timestamp, item.count, false));
     }
   });
 
   if (shouldScrollToBottom) {
     messagesHolder.scrollTop = messagesHolder.scrollHeight;
+  }
+}
+
+async function loadPrevMessages() {
+  const response = await fetch(`/app/messages/${messages[0].count}-<`);
+  const data = await response.json();
+
+  if (messagesHolder.scrollTop <= loadingText.offsetHeight && data.length > 0) {
+    const messagesIndex = messages.length;
+    data.forEach(item => {
+      if (item.type == "message") {
+        messages.unshift(new Message(item.nickname, item.text, item.timestamp, item.count, true));
+      } else if (item.type == "status") {
+        messages.unshift(new Status(item.text, item.timestamp, item.count, true));
+      }
+    });
+
+    messagesHolder.scrollTop = messagesHolder.scrollHeight - messages[messagesIndex].rootElement.offsetTop - messagesHolder.offsetTop;
+  }
+
+  if (data.length == 0) {
+    loadingText.textContent = "You reached the beggining of the chat.";
   }
 }
 
@@ -148,9 +183,9 @@ async function redirectIfInvalidSessionId() {
 }
 
 function startEverything() {
-  loadMessages().then(() => (messagesHolder.scrollTop = messagesHolder.scrollHeight));
+  loadMessages(":").then(() => (messagesHolder.scrollTop = messagesHolder.scrollHeight));
   let loadMessagesInterval = setInterval(() => {
-    loadMessages().catch(err => {
+    loadMessages(getParamToPut()).catch(err => {
       console.error(err), clearInterval(loadMessagesInterval);
     });
   }, 1000);
@@ -161,6 +196,20 @@ function startEverything() {
       sendToServer();
     }
   });
+
+  messagesHolder.onscroll = event => {
+    if (messagesHolder.scrollTop <= loadingText.offsetHeight) {
+      loadPrevMessages();
+    }
+  };
+}
+
+function getParamToPut() {
+  if (messages.length > 0) {
+    return (messages[messages.length - 1].count + 1).toString() + "->";
+  } else {
+    return ":";
+  }
 }
 
 redirectIfInvalidSessionId().then(startEverything);
