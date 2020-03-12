@@ -1,5 +1,7 @@
 const database = require(global.rootDir + "/database");
 
+let count = 0;
+
 module.exports = async (request, response) => {
   const data = request.body;
   const timestamp = Date.now();
@@ -18,11 +20,13 @@ module.exports = async (request, response) => {
     if (result.status == "NotFound") return response.status(401).send("ERROR: INVALID SESSION ID");
 
     const doc = result.doc;
+    const count = await database.getDatabaseCount(database.messagesDatabase);
     const dataToInsert = {
       type: "message",
       nickname: doc.nickname, //find username with session id then insert to database
       text: data.text,
-      timestamp: timestamp
+      timestamp: timestamp,
+      count: count
     };
 
     database.messagesDatabase.insert(dataToInsert);

@@ -76,3 +76,15 @@ module.exports.removeByPropertyInDatabase = (property, database) => {
     });
   });
 };
+
+module.exports.getDatabaseCount = database => {
+  return new Promise((resolve, reject) => {
+    database.count({}, (err, count) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(count);
+      }
+    });
+  });
+};
