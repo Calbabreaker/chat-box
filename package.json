@@ -1,0 +1,33 @@
+{
+  "name": "chat-box",
+  "version": "1.0.0",
+  "description": "Simple Chatbox built in node",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "chatbox",
+    "test"
+  ],
+  "author": "Calbabreaker",
+  "license": "MIT",
+  "dependencies": {
+    "argon2": "^0.26.2",
+    "compression": "^1.7.4",
+    "ejs": "^3.0.2",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "express-validator": "^6.4.0",
+    "nedb": "^1.8.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Calbabreaker/chat-box.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Calbabreaker/chat-box/issues"
+  },
+  "homepage": "https://github.com/Calbabreaker/chat-box#readme"
+}

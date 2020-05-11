@@ -1,0 +1,108 @@
+@import url("https://fonts.googleapis.com/css?family=Lato|Roboto&display=swap");
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  overflow: hidden;
+  font-family: "Roboto", sans-serif;
+  background-color: #26262b;
+  color: white;
+}
+
+a {
+  color: rgb(158, 158, 158);
+}
+
+p,
+h1,
+label,
+input {
+  margin: 5px;
+}
+
+.centeredContent {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#titleText {
+  font-size: 50px;
+}
+
+#description {
+  font-size: 25px;
+  margin-top: 20px;
+}
+
+/* for forms */
+
+.textInput {
+  --size: 30px;
+  width: calc(var(--size) * 16);
+  height: var(--size);
+  margin-bottom: 10px;
+  margin-top: 5px;
+}
+
+.submit {
+  border: 1px solid grey;
+  --size: 30px;
+  font-size: 16px;
+  width: calc(var(--size) * 5);
+  height: var(--size);
+}
+
+label {
+  font-size: 16px;
+  text-align: left;
+}
+
+/* end forms */
+
+/* for the nav bar  */
+
+nav {
+  margin: -8px;
+  margin-bottom: 5px;
+  padding: 10px;
+  user-select: none;
+  display: flex;
+  align-items: center;
+}
+
+nav a {
+  text-decoration: none;
+}
+
+nav .title {
+  font-size: 30px;
+  margin: 0;
+  margin-left: 5px;
+  margin-right: 20px;
+  max-width: fit-content;
+  font-family: "Roboto", sans-serif;
+  flex: 1;
+  color: white;
+}
+
+nav .links {
+  font-size: 14px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+nav .links:hover {
+  color: rgb(133, 133, 133);
+}
+
+nav .title:hover {
+  color: rgb(221, 221, 221);
+}
+
+/* end nav bar */
