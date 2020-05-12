@@ -1,5 +1,6 @@
 const datastore = require("nedb");
 
+// uses nedb and this justs makes it esier by putting it into Promises
 class Database {
   constructor(name) {
     this.database = new datastore(name + ".dat");
@@ -9,13 +10,9 @@ class Database {
   checkProperty(property) {
     return new Promise((resolve, reject) => {
       this.database.findOne(property, (err, doc) => {
-        if (err) {
-          reject(err);
-        } else if (doc != null) {
-          resolve({ status: "Found", doc: doc });
-        } else {
-          resolve({ status: "NotFound", doc: doc });
-        }
+        if (err) reject(err);
+        else if (doc != null) resolve({ found: true, doc: doc });
+        else resolve({ found: false, doc: doc });
       });
     });
   }
@@ -23,13 +20,8 @@ class Database {
   removeByProperty(property) {
     return new Promise((resolve, reject) => {
       this.database.remove(property, { multi: true }, (err, doc) => {
-        if (err) {
-          reject(err);
-        } else if (doc != null) {
-          resolve({ status: "Sucess" });
-        } else {
-          resolve({ status: "Fail" });
-        }
+        if (err) reject(err);
+        else resolve();
       });
     });
   }
@@ -37,11 +29,8 @@ class Database {
   getCount() {
     return new Promise((resolve, reject) => {
       this.database.count({}, (err, count) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(count);
-        }
+        if (err) reject(err);
+        else resolve(count);
       });
     });
   }
@@ -51,22 +40,16 @@ class Database {
       .find({}, { _id: 0 })
       .sort(sort)
       .exec((err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
-        }
+        if (err) reject(err);
+        else resolve(data);
       });
   }
 
   insert(toInsert) {
     return new Promise((resolve, reject) => {
       this.database.insert(toInsert, (err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve();
-        }
+        if (err) reject(err);
+        else resolve();
       });
     });
   }

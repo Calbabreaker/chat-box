@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 5000;
 global.rootDir = __dirname;
 
 const options = require("./app/options");
-const usersController = require("./app/usersController");
+const usersController = require("./app/controller/user");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -22,15 +22,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// VIEWS
-app.get("/", (req, res) => res.render("home"));
-app.get("/signin", (req, res) => res.render("signin"));
-app.get("/signup", (req, res) => res.render("signup"));
-app.get("/signout", usersController.signout);
+app.use(usersController.router);
 
-// POST
-app.post("/signin", usersController.validate("signin"), usersController.signin);
-app.post("/signup", usersController.validate("signup"), usersController.signup);
+app.get("/", (req, res) => res.render("home"));
 
 // NOT FOUND
 app.use((req, res) => {

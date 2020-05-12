@@ -1,28 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <%- include("./partials/head") %>
-    <title>Chat Box - Sign In</title>
+    <%- include("../partials/head") %>
+    <title>Chat Box - Sign Up</title>
   </head>
   <body>
-    <%- include("./partials/nav") %>
+    <%- include("../partials/nav") %>
     <div class="centeredContent">
-      <form action="javascript:void(0);" method="post" onsubmit="signin();">
-        <h1 id="titleText" style="margin-bottom: 40px;" class="centeredContent">Login into your account</h1>
+      <form action="javascript:void(0);" method="post" onsubmit="signup();">
+        <h1 id="titleText" style="margin-bottom: 40px;" class="centeredContent">Create your account</h1>
         <label for="username">Username:</label><br />
         <input class="textInput" id="username" name="username" type="text" /><br />
 
         <label for="password">Password:</label><br />
         <input class="textInput" id="password" name="password" type="password" /><br />
 
-        <input class="submit" type="submit" value="Login" />
+        <label for="confirmPassword">Confirm password:</label><br />
+        <input class="textInput" id="confirmPassword" name="confirmPassword" type="password" /><br />
+
+        <input class="submit" type="submit" value="Sign Up" />
       </form>
     </div>
 
     <script>
-      async function signin() {
+      async function signup() {
+        const displayname = document.getElementById("username").value;
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
 
         const options = {
           method: "POST",
@@ -30,8 +35,10 @@
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            displayname: displayname,
             username: username,
             password: password,
+            confirmPassword: confirmPassword,
           }),
         };
 
@@ -48,7 +55,7 @@
           });
         } else if (!data.success) {
           console.log(data.errors);
-          alert("There was an unknown problem preventing signing in.");
+          alert("There was an unknown problem preventing creation.");
         } else {
           location.href = "/";
         }
