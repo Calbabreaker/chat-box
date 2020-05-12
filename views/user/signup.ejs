@@ -9,6 +9,9 @@
     <div class="centeredContent">
       <form action="javascript:void(0);" method="post" onsubmit="signup();">
         <h1 id="titleText" style="margin-bottom: 40px;" class="centeredContent">Create your account</h1>
+        <label for="username">Display name:</label><br />
+        <input class="textInput" id="displayname" name="displayname" type="text" /><br />
+
         <label for="username">Username:</label><br />
         <input class="textInput" id="username" name="username" type="text" /><br />
 
@@ -24,7 +27,7 @@
 
     <script>
       async function signup() {
-        const displayname = document.getElementById("username").value;
+        const displayname = document.getElementById("displayname").value;
         const username = document.getElementById("username").value;
         const password = document.getElementById("password").value;
         const confirmPassword = document.getElementById("confirmPassword").value;

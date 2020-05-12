@@ -22,6 +22,7 @@ h1,
 label,
 input {
   margin: 5px;
+  margin-left: 6px;
 }
 
 .centeredContent {

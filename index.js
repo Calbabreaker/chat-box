@@ -6,7 +6,7 @@ const PORT = process.env.PORT || 5000;
 global.rootDir = __dirname;
 
 const options = require("./app/options");
-const usersController = require("./app/controller/user");
+const usersController = require("./app/controller/user/main");
 
 const app = express();
 app.set("view engine", "ejs");
