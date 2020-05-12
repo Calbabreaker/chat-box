@@ -6,7 +6,7 @@ exports.getSession = (app) => {
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7 * 4, // 4 weeks
     },
-    name: "defenders.sid",
+    name: "chatbox.sid",
     saveUninitialized: true,
     resave: false,
   };
