@@ -1,8 +1,8 @@
 <nav>
   <a class="title" href="/"">Chat Box</a>
   <% if (user){ %>
-    <a class="links" href="users/<%= user.username %>">My account</a>
-    <a class="links" href="signout/">Sign Out</a>
+    <a class="links" href="/users/<%= user.username %>">My account</a>
+    <a class="links" href="/signout/">Sign Out</a>
   <% } else { %>
     <a class="links" href="/signin">Sign In</a>
     <a class="links" href="/signup">Sign Up</a>
