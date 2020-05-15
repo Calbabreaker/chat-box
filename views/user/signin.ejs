@@ -3,6 +3,7 @@
   <head>
     <%- include("../partials/head") %>
     <title>Chat Box - Sign In</title>
+    <link rel="stylesheet" href="/assets/css/bigform.css" />
   </head>
   <body>
     <%- include("../partials/nav") %>
@@ -50,7 +51,7 @@
           console.log(data.errors);
           alert("There was an unknown problem preventing signing in.");
         } else {
-          location.href = "/";
+          location.href = "/room/hub";
         }
       }
     </script>

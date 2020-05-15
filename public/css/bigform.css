@@ -1,0 +1,25 @@
+/* for forms */
+
+.textInput {
+  --size: 30px;
+  font-size: 16px;
+  width: calc(var(--size) * 16);
+  height: var(--size);
+  margin-bottom: 10px;
+  margin-top: 5px;
+}
+
+.submit {
+  border: 1px solid grey;
+  --size: 30px;
+  font-size: 16px;
+  width: calc(var(--size) * 5);
+  height: var(--size);
+}
+
+label {
+  font-size: 16px;
+  text-align: left;
+}
+
+/* end forms */

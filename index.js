@@ -1,18 +1,32 @@
-const express = require("express");
-const session = require("express-session");
 const compression = require("compression");
+const express = require("express");
 
 const PORT = process.env.PORT || 5000;
 global.rootDir = __dirname;
 
+// INITIALISE EVERYTHING
+const app = (module.exports.app = express());
+const server = require("http").createServer(app);
+const io = (module.exports.io = require("socket.io")(server));
 const options = require("./app/options");
 const usersController = require("./app/controller/user/main");
+const roomController = require("./app/controller/room/main");
 
-const app = express();
+// EXPRESS MIDDLEWARES
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(compression());
-app.use(session(options.getSession(app)));
+app.use(options.session);
+
+// some set up stuff with io and express
+io.use((socket, next) => {
+  options.session(socket.request, socket.request.res || {}, next);
+});
+
+if (app.get("env") === "production") {
+  app.set("trust proxy", 1);
+  options.cookie.secure = true;
+}
 
 app.use("/assets", express.static(__dirname + "/public/"));
 
@@ -22,13 +36,19 @@ app.use((req, res, next) => {
   next();
 });
 
+// ROUTERS
 app.use(usersController.router);
+app.use(roomController.router);
 
+// MAIN ENDPOINTS
 app.get("/", (req, res) => res.render("home"));
 
 // NOT FOUND
 app.use((req, res) => {
-  res.status(404).render("404");
+  res.status(404);
+  if (req.path.startsWith("/assets")) return res.send("Asset not found. Go back to <a href='/'>homepage</a>");
+  if (req.path.startsWith("/api")) return res.send("-1");
+  res.render("404");
 });
 
-app.listen(PORT, () => console.log("Server starting..."));
+server.listen(PORT, () => console.log("Server running..."));

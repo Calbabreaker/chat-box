@@ -3,11 +3,10 @@ const argon2 = require("argon2");
 const express = require("express");
 const datastore = require(global.rootDir + "/app/middleware/database");
 
-const usersDatabase = new datastore("usersDatabase");
-exports.usersDatabase = usersDatabase;
-const router = (module.exports.router = express.Router());
+const usersDatabase = (exports.usersDatabase = new datastore("usersDatabase"));
+const router = (exports.router = express.Router());
 
-const validate = require("./validate")(usersDatabase);
+const validate = require("./validate");
 
 // GET REQUESTS / VIEWS
 router.get("/signin", (req, res) => res.render("user/signin"));
@@ -18,15 +17,6 @@ router.get("/signout", async (req, res) => {
   res.redirect("/");
 });
 
-router.get("/user/:username", async (req, res) => {
-  const data = req.params;
-  const result = await usersDatabase.checkProperty({ username: data.username });
-  if (result.found) {
-    res.locals.viewuser = result.doc;
-    res.render("user/viewuser");
-  } else res.render("404");
-});
-
 // POST REQUESTS
 // signup creates user with hased password and all the stuff
 router.post("/signup", validate.signup(), async (req, res) => {
@@ -34,11 +24,11 @@ router.post("/signup", validate.signup(), async (req, res) => {
   if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
   try {
     const data = req.body;
-
     const user = {
       displayname: data.displayname,
       username: data.username,
       password: await argon2.hash(data.password, { type: argon2.argon2d }),
+      iconpath: "default.webp",
     };
 
     await usersDatabase.insert(user);
