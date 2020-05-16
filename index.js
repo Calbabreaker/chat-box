@@ -23,11 +23,6 @@ io.use((socket, next) => {
   options.session(socket.request, socket.request.res || {}, next);
 });
 
-if (app.get("env") === "production") {
-  app.set("trust proxy", 1);
-  options.cookie.secure = true;
-}
-
 app.use("/assets", express.static(__dirname + "/public/"));
 
 // FOR SESSION

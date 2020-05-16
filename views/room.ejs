@@ -84,10 +84,12 @@
       const socket = io();
 
       const messagesHolder = document.getElementById("messages");
+      const messageInput = document.getElementById("message");
 
       function sendMessage() {
-        const messageText = document.getElementById("message").value;
+        const messageText = messageInput.value;
         socket.emit("SendMessage", messageText);
+        messageInput.value = "";
       }
 
       socket.on("disconnect", () => (location.href = "/"));
