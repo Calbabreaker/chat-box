@@ -18,12 +18,6 @@ a {
   color: rgb(158, 158, 158);
 }
 
-p,
-h1 {
-  margin: 5px;
-  margin-left: 6px;
-}
-
 .centeredContent {
   display: flex;
   justify-content: center;
