@@ -97,13 +97,28 @@
       socket.on("disconnect", () => (location.href = "/"));
 
       socket.on("RecieveMessage", (messageData) => {
-        messagesHolder.appendChild(createMessageElement(messageData.iconpath, messageData.displayname, messageData.username, messageData.message));
+        messagesHolder.appendChild(createMessageElement(messageData));
         if (messagesHolder.scrollTop - messagesHolder.scrollTop - messagesHolder.clientHeight < 10) {
           messagesHolder.scrollTop = messagesHolder.scrollHeight;
         }
       });
 
-      function createMessageElement(iconpath, displayname, username, message) {
+      messagesHolder.addEventListener("scroll", () => {
+        if (messagesHolder.scrollTop < 10 && oldestMessageIndex > 0) {
+          const oldScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight;
+          socket.emit("GetMore", oldestMessageIndex.toString(), (messages) => {
+            messages.reverse().forEach(message => messagesHolder.insertBefore(createMessageElement(message), messagesHolder.firstChild))
+            oldestMessageIndex -= messages.length;
+
+            const newScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight
+            messagesHolder.scrollTop = newScroll - oldScroll;
+          });
+        }
+      });
+
+      function createMessageElement(messageData) {
+        const {iconpath, displayname, username, message} = messageData;
+
         const messageDiv = document.createElement("div");
         messageDiv.classList.add("message");
 
@@ -128,9 +143,11 @@
         return messageDiv;
       }
 
+      let oldestMessageIndex = <%- (room.messages.length >= 20 ? room.messages.length - 20 : 0) %>
+
       // create the last 10 messages
-      <% for(let i = (room.messages.length >= 10 ? room.messages.length - 10 : 0); i < room.messages.length; i++) { %>
-        messagesHolder.appendChild(createMessageElement("<%-room.messages[i].iconpath%>", "<%-room.messages[i].displayname%>", "<%-room.messages[i].username%>", "<%-room.messages[i].message%>"));
+      <% for(let i = (room.messages.length >= 20 ? room.messages.length - 20 : 0); i < room.messages.length; i++) { %>
+        messagesHolder.appendChild(createMessageElement(JSON.parse('<%-JSON.stringify(room.messages[i])%>')));
       <% } %>
 
       messagesHolder.scrollTop = messagesHolder.scrollHeight;

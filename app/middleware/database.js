@@ -8,9 +8,9 @@ class Database {
     this.database.persistence.setAutocompactionInterval(60000);
   }
 
-  checkProperty(property) {
+  checkProperty(property, projection = {}) {
     return new Promise((resolve, reject) => {
-      this.database.findOne(property, (err, doc) => {
+      this.database.findOne(property, projection, (err, doc) => {
         if (err) reject(err);
         else if (doc != null) resolve({ found: true, doc: doc });
         else resolve({ found: false, doc: doc });
