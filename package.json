@@ -8,8 +8,11 @@
     "rediscli": "node ./node_modules/redis-cli/index.js"
   },
   "keywords": [
-    "chatbox",
-    "test"
+    "chat",
+    "node",
+    "html",
+    "express",
+    "socketio"
   ],
   "author": "Calbabreaker",
   "license": "MIT",
