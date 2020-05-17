@@ -33,10 +33,6 @@ Start the node server:
 npm start
 ```
 
-## Heroku App
-
-The chat box is now up on heroku! Go to https://calbabreaker-chat-box.herokuapp.com/ and see!
-
 ## LICENSE
 
 GPL-3.0
