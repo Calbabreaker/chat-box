@@ -6,11 +6,10 @@ const usersDatabase = require("./main").usersDatabase;
 // it kind of looks messy but i dont know how to do it differently
 exports.signup = () => {
   return [
-    check("displayname").isLength({ min: 3, max: 32 }).withMessage("Must be between 3 and 32 characters"),
+    check("displayname").stripLow().isLength({ min: 3, max: 32 }).withMessage("Must be between 3 and 32 characters").escape(),
     check("username")
       .customSanitizer(toLowerCase)
-      .trim()
-      .isLength({ min: 3, max: 32 })
+      .custom((value) => !/\s/.test(value))
       .withMessage("Must be between 3 and 32 characters")
       .isAlphanumeric()
       .withMessage("Must contain valid alpha numeric characters")

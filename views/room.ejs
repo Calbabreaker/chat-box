@@ -3,7 +3,7 @@
   <head>
     <%- include("./partials/head") %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-    <title>Chat Box</title>
+    <title>Chat Box - <%= room.name %></title>
     <style>
       ul,
       ul li {
@@ -81,15 +81,17 @@
     </div>
 
     <script>
-      const socket = io();
+      const socket = io("", { query: "roomid=<%= room.id %>" });
 
       const messagesHolder = document.getElementById("messages");
       const messageInput = document.getElementById("message");
 
       function sendMessage() {
         const messageText = messageInput.value;
-        socket.emit("SendMessage", messageText);
-        messageInput.value = "";
+        if (/\S/.test(messageText) && messageText.length >= 1 && messageText.length <= 500) {
+          socket.emit("SendMessage", messageText);
+          messageInput.value = "";
+        }
       }
 
       socket.on("disconnect", () => (location.href = "/"));
@@ -106,7 +108,7 @@
         img.classList.add("usericon");
         img.setAttribute("alt", "user icon");
         img.setAttribute("draggable", "false");
-        img.setAttribute("src", "/assets/usercontent/icons/" + iconpath);
+        img.setAttribute("src", "/assets/usercontent/" + iconpath);
 
         const messageText = document.createElement("p");
         messageText.classList.add("messagetext");
@@ -122,6 +124,8 @@
         messageDiv.appendChild(messageText);
         return messageDiv;
       }
+
+      // create the last 10 messages
     </script>
   </body>
 </html>

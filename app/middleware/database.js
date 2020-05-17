@@ -36,13 +36,15 @@ class Database {
   }
 
   getAll(sort = {}) {
-    this.database
-      .find({}, { _id: 0 })
-      .sort(sort)
-      .exec((err, data) => {
-        if (err) reject(err);
-        else resolve(data);
-      });
+    return new Promise((resolve, reject) => {
+      this.database
+        .find({}, { _id: 0 })
+        .sort(sort)
+        .exec((err, data) => {
+          if (err) reject(err);
+          else resolve(data);
+        });
+    });
   }
 
   insert(toInsert) {
@@ -50,6 +52,15 @@ class Database {
       this.database.insert(toInsert, (err) => {
         if (err) reject(err);
         else resolve();
+      });
+    });
+  }
+
+  update(query, theUpdate, options = {}) {
+    return new Promise((resolve, reject) => {
+      this.database.update(query, theUpdate, options, (err, doc) => {
+        if (err) reject(err);
+        else resolve(doc);
       });
     });
   }

@@ -8,6 +8,8 @@ const RedisStore = require("connect-redis")(session);
 
 const isProduction = process.env.NODE_ENV === "production";
 
+redisClient.on("error", console.error);
+
 // uses redis store to store the session data
 const sessionOption = {
   secret: random(32).toString("base64"),
@@ -18,9 +20,9 @@ const sessionOption = {
     secure: isProduction,
   },
   name: "chatbox.sid",
-  resave: false,
+  resave: true,
   saveUninitialized: false,
-  store: new RedisStore({ host: "localhost", port: 6379, client: redisClient, ttl: 86400 }),
+  store: new RedisStore({ host: "localhost", port: 6379, client: redisClient }),
 };
 
 // trust proxy if production

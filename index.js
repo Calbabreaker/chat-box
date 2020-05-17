@@ -27,6 +27,7 @@ app.use("/assets", express.static(__dirname + "/public/"));
 
 // FOR SESSION
 app.use((req, res, next) => {
+  if (req.session == null) return next(new Error("Connection Invalid"));
   res.locals.user = req.session.user;
   next();
 });
