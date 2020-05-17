@@ -3,7 +3,7 @@
   <head>
     <%- include("./partials/head") %>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-    <title>Chat Box - <%= room.name %></title>
+    <title>Chat Box - <%- room.name %></title>
     <style>
       ul,
       ul li {
@@ -98,6 +98,9 @@
 
       socket.on("RecieveMessage", (messageData) => {
         messagesHolder.appendChild(createMessageElement(messageData.iconpath, messageData.displayname, messageData.username, messageData.message));
+        if (messagesHolder.scrollTop - messagesHolder.scrollTop - messagesHolder.clientHeight < 10) {
+          messagesHolder.scrollTop = messagesHolder.scrollHeight;
+        }
       });
 
       function createMessageElement(iconpath, displayname, username, message) {
@@ -126,6 +129,11 @@
       }
 
       // create the last 10 messages
+      <% for(let i = (room.messages.length >= 10 ? room.messages.length - 10 : 0); i < room.messages.length; i++) { %>
+        messagesHolder.appendChild(createMessageElement("<%-room.messages[i].iconpath%>", "<%-room.messages[i].displayname%>", "<%-room.messages[i].username%>", "<%-room.messages[i].message%>"));
+      <% } %>
+
+      messagesHolder.scrollTop = messagesHolder.scrollHeight;
     </script>
   </body>
 </html>

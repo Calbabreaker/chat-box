@@ -5,6 +5,7 @@ class Database {
   constructor(name) {
     this.database = new datastore(name + ".dat");
     this.database.loadDatabase();
+    this.database.persistence.setAutocompactionInterval(60000);
   }
 
   checkProperty(property) {
