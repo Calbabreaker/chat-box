@@ -143,11 +143,11 @@
         return messageDiv;
       }
 
-      let oldestMessageIndex = <%- (room.messages.length >= 20 ? room.messages.length - 20 : 0) %>
+      let oldestMessageIndex = <%- (messages.length >= 20 ? messages.length - 20 : 0) %>
 
       // create the last 10 messages
-      <% for(let i = (room.messages.length >= 20 ? room.messages.length - 20 : 0); i < room.messages.length; i++) { %>
-        messagesHolder.appendChild(createMessageElement(JSON.parse('<%-JSON.stringify(room.messages[i])%>')));
+      <% for(let i = (messages.length >= 20 ? messages.length - 20 : 0); i < messages.length; i++) { %>
+        messagesHolder.appendChild(createMessageElement(JSON.parse('<%-JSON.stringify(messages[i])%>')));
       <% } %>
 
       messagesHolder.scrollTop = messagesHolder.scrollHeight;

@@ -3,7 +3,7 @@ const argon2 = require("argon2");
 const express = require("express");
 const datastore = require(global.rootDir + "/app/middleware/database");
 
-const usersDatabase = (exports.usersDatabase = new datastore("usersDatabase"));
+const usersDatabase = (exports.usersDatabase = new datastore("databases/users"));
 const router = (exports.router = express.Router());
 
 const validate = require("./validate");
