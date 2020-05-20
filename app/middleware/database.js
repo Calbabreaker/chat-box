@@ -1,9 +1,9 @@
-const datastore = require("nedb");
+const Datastore = require("nedb");
 
 // uses nedb and this justs makes it esier by putting it into Promises
 class Database {
   constructor(name) {
-    this.database = new datastore(name + ".dat");
+    this.database = new Datastore(name + ".dat");
     this.database.loadDatabase();
   }
 

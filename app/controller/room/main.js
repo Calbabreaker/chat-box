@@ -1,7 +1,7 @@
 const express = require("express");
-const datastore = require(global.rootDir + "/app/middleware/database");
+const Datastore = require(global.rootDir + "/app/middleware/database");
 
-const roomsDatabase = (exports.roomsDatabase = new datastore("databases/rooms"));
+const roomsDatabase = (exports.roomsDatabase = new Datastore("databases/rooms"));
 const messagesDatabases = (exports.messagesDatabases = {});
 
 require("./io")(); // do all the io setup (diffrent folder for cleaniless)
@@ -30,7 +30,7 @@ async function createRoom(name, id) {
   };
 
   await roomsDatabase.insert(data);
-  messagesDatabases[id] = new datastore("databases/messages/" + data.id);
+  messagesDatabases[id] = new Datastore("databases/messages/" + data.id);
 }
 
 async function startSetup() {
@@ -41,7 +41,7 @@ async function startSetup() {
   // loads all the messages database from all the rooms
   const allRooms = await roomsDatabase.getAll();
   allRooms.forEach((room) => {
-    messagesDatabases[room.id] = new datastore("databases/messages/" + room.id);
+    messagesDatabases[room.id] = new Datastore("databases/messages/" + room.id);
   });
 }
 
