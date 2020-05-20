@@ -82,6 +82,7 @@
 
     <script>
       const socket = io("", { query: "roomid=<%= room.id %>" });
+      let gettingMessage = false;
 
       const messagesHolder = document.getElementById("messages");
       const messageInput = document.getElementById("message");
@@ -104,14 +105,16 @@
       });
 
       messagesHolder.addEventListener("scroll", () => {
-        if (messagesHolder.scrollTop < 10 && oldestMessageIndex > 0) {
+        if (messagesHolder.scrollTop < 10 && oldestMessageIndex > 0 && !gettingMessage) {
           const oldScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight;
+          gettingMessage = true;
           socket.emit("GetMore", oldestMessageIndex.toString(), (messages) => {
             messages.reverse().forEach(message => messagesHolder.insertBefore(createMessageElement(message), messagesHolder.firstChild))
             oldestMessageIndex -= messages.length;
 
             const newScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight
             messagesHolder.scrollTop = newScroll - oldScroll;
+            gettingMessage = false;
           });
         }
       });

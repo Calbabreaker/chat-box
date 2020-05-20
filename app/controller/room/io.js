@@ -31,6 +31,7 @@ module.exports = () => {
         try {
           const fromWhere = validator.toInt(fromWhereString);
           if (isNaN(fromWhere)) throw new Error("fromWhere not valid integer");
+          console.log(fromWhere);
 
           const messages = await messagesDatabases[connectedRoom.id].getAll({ timestamp: 1 });
           getCallback(messages.slice(fromWhere - 15 >= 0 ? fromWhere - 15 : 0, fromWhere));
