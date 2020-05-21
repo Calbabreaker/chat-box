@@ -26,43 +26,10 @@
       </form>
     </div>
 
+    <script src="/assets/js/basicFuncs.js"></script>
     <script>
       async function signup() {
-        const displayname = document.getElementById("displayname").value;
-        const username = document.getElementById("username").value;
-        const password = document.getElementById("password").value;
-        const confirmPassword = document.getElementById("confirmPassword").value;
-
-        const options = {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            displayname: displayname,
-            username: username,
-            password: password,
-            confirmPassword: confirmPassword,
-          }),
-        };
-
-        const response = await fetch("", options);
-        const data = await response.json();
-
-        if (response.status === 422) {
-          // loop through the errors and sets inputs iccordingly
-          [...document.getElementsByClassName("textInput")].forEach((input) => ((input.style.backgroundColor = "#96ff9e"), input.removeAttribute("title")));
-          data.errors.forEach((error) => {
-            const whichErrorElement = document.getElementById(error.param);
-            whichErrorElement.style.backgroundColor = "#fc9090";
-            whichErrorElement.setAttribute("title", error.msg);
-          });
-        } else if (!data.success) {
-          console.log(data.errors);
-          alert("There was an unknown problem preventing creation.");
-        } else {
-          location.href = "/room/hub";
-        }
+        fetchAndHandle("", ["username", "password", "displayname", "confirmPassword"], "/room/hub");
       }
     </script>
   </body>
