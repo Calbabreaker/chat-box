@@ -2,6 +2,10 @@
 
 A chatting app with accounts just like the thousands of ones out there except probaly worse.
 
+## Demo
+
+Working demo on [Server](https://naltonsoftware.com/chatbox).
+
 ## Instalation
 
 If you want to use this, then give credit.
