@@ -3,7 +3,7 @@
   <head>
     <%- include("../partials/head") %>
     <title>Chat Box - Sign In</title>
-    <link rel="stylesheet" href="/assets/css/bigform.css" />
+    <link rel="stylesheet" href="/<%= PROXY_URL %>/assets/css/bigform.css" />
   </head>
   <body>
     <%- include("../partials/nav") %>
@@ -20,10 +20,10 @@
       </form>
     </div>
 
-    <script src="/assets/js/basicFuncs.js"></script>
+    <script src="/<%= PROXY_URL %>/assets/js/basicFuncs.js"></script>
     <script>
       function signin() {
-        fetchAndHandle("", ["username", "password"], "/room/hub");
+        fetchAndHandle("", ["username", "password"], "/<%= PROXY_URL %>/room/hub");
       }
     </script>
   </body>

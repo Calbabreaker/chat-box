@@ -20,6 +20,7 @@
     "argon2": "^0.26.2",
     "compression": "^1.7.4",
     "connect-redis": "^4.0.4",
+    "dotenv": "^8.2.0",
     "ejs": "^3.0.2",
     "express": "^4.17.1",
     "express-session": "^1.17.1",

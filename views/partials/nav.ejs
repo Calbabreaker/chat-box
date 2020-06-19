@@ -1,10 +1,10 @@
 <nav>
-  <a class="title" href="/"">Chat Box</a>
+  <a class="title" href="/<%= PROXY_URL %>/"">Chat Box</a>
   <% if (user){ %>
-    <a class="links" href="/room/hub/">Hub</a>
-    <a class="links" href="/signout/">Sign Out</a>
+    <a class="links" href="/<%= PROXY_URL %>/room/hub/">Hub</a>
+    <a class="links" href="/<%= PROXY_URL %>/signout/">Sign Out</a>
   <% } else { %>
-    <a class="links" href="/signin">Sign In</a>
-    <a class="links" href="/signup">Sign Up</a>
+    <a class="links" href="/<%= PROXY_URL %>/signin">Sign In</a>
+    <a class="links" href="/<%= PROXY_URL %>/signup">Sign Up</a>
   <% } %>
 </nav>

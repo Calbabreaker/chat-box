@@ -96,7 +96,7 @@
         }
       }
 
-      socket.on("disconnect", () => (location.href = "/"));
+      // socket.on("disconnect", () => (location.href = "/"));
 
       socket.on("RecieveMessage", (messageData) => {
         messagesHolder.appendChild(createMessageElement(messageData));

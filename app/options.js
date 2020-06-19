@@ -9,10 +9,11 @@ const RedisStore = require("connect-redis")(session);
 const isProduction = process.env.NODE_ENV === "production";
 
 redisClient.on("error", console.error);
+if (process.env.REDIS_PASS != null) redisClient.auth(process.env.REDIS_PASS);
 
 // uses redis store to store the session data
 const sessionOption = {
-  secret: random(32).toString("base64"),
+  secret: "asd",
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7 * 2, // 2 weeks
     sameSite: true,

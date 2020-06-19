@@ -2,3 +2,4 @@ node_modules/
 databases/
 public/usercontent/*
 !public/usercontent/default.webp
+.env

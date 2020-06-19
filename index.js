@@ -1,7 +1,8 @@
 const compression = require("compression");
 const express = require("express");
+require("dotenv").config();
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.CUSTOM_PORT;
 global.rootDir = __dirname;
 
 // INITIALISE EVERYTHING
@@ -28,6 +29,7 @@ app.use("/assets", express.static(__dirname + "/public/"));
 // FOR SESSION
 app.use((req, res, next) => {
   if (req.session == null) return next(new Error("Connection Invalid"));
+  res.locals.PROXY_URL = process.env.PROXY_URL || "";
   res.locals.user = req.session.user;
   next();
 });

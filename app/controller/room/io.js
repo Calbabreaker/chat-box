@@ -16,7 +16,7 @@ module.exports = () => {
       socket.on("SendMessage", async (msg) => {
         try {
           // check if message is between 1 and 500 characters and doesn't have only spaces then it cleans xss
-          if (!validator.isLength(msg, { min: 1, max: 500 }) || !/\S/.test(msg)) throw new Error("Invalid message");
+          if (!validator.isLength(validator.stripLow(msg), { min: 1, max: 500 }) || !/\S/.test(msg)) throw new Error("Invalid message");
           const user = socket.request.session.user;
           const messageData = { message: validator.escape(msg), timestamp: Date.now(), username: user.username, displayname: user.displayname, iconpath: user.iconpath };
           io.to(connectedRoom.id).emit("RecieveMessage", messageData);
