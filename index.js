@@ -3,6 +3,7 @@ const express = require("express");
 require("dotenv").config();
 
 const PORT = process.env.CUSTOM_PORT;
+const PROXY_URL = process.env.PROXY_URL;
 global.rootDir = __dirname;
 
 // INITIALISE EVERYTHING
@@ -29,7 +30,9 @@ app.use("/assets", express.static(__dirname + "/public/"));
 // FOR SESSION
 app.use((req, res, next) => {
   if (req.session == null) return next(new Error("Connection Invalid"));
-  res.locals.PROXY_URL = process.env.PROXY_URL || "";
+  if (PROXY_URL) res.locals.PROXY_URL = "/" + PROXY_URL;
+  else res.locals.PROXY_URL = "";
+
   res.locals.user = req.session.user;
   next();
 });

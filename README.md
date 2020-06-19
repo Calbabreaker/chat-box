@@ -37,6 +37,8 @@ Start the node server:
 npm start
 ```
 
+You might want to edit the .env to your likings (explenation in .env_sample)
+
 ## LICENSE
 
 GPL-3.0
