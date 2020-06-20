@@ -8,6 +8,7 @@
   margin-bottom: 10px;
   margin-top: 5px;
   padding: 5px;
+  border-radius: 2px;
 }
 
 .textInput:hover ~ .tooltip {
@@ -18,20 +19,9 @@ form div {
   position: relative;
 }
 
-.tooltip {
-  visibility: hidden;
-  top: -5px;
-  font-size: 14px;
-  right: 0;
-  width: fit-content;
-  background-color: black;
-  color: #fff;
-  text-align: right;
-  padding: 5px;
-  border-radius: 6px;
-
-  position: absolute;
-  z-index: 2;
+.loadingIcon {
+  margin-bottom: -8px;
+  margin-right: -8px;
 }
 
 .submit {

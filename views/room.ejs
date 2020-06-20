@@ -35,7 +35,7 @@
         vertical-align: bottom;
         height: calc(100vh - 118px);
         width: 100vw;
-        border-radius: 10px 10px 0 0;
+        border-radius: 5px 5px 0 0;
       }
 
       #messages {
@@ -70,18 +70,29 @@
         border-radius: 40px;
         margin-left: 10px;
       }
+
+      #messageLoadingIcon {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 5px;
+      }
     </style>
   </head>
   <body>
     <%- include("./partials/nav") %>
     <div id="chat">
-      <div id="messages"></div>
+      <div id="messages">
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="messageLoadingIcon" />
+        <div style="display: none;"></div>
+      </div>
       <form action="javascript:void(0);" method="post" onsubmit="sendMessage();">
         <input class="textInput" id="message" name="message" type="text" placeholder="Send a message" />
       </form>
     </div>
 
     <script>
+      const loadingIcon = document.getElementById("messageLoadingIcon");
       const socket = io("", { query: "roomid=<%= room.id %>", path: "<%= PROXY_URL %>/socket.io" });
       let gettingMessage = false;
 
@@ -99,7 +110,7 @@
       // socket.on("disconnect", () => (location.href = "/"));
 
       socket.on("RecieveMessage", (messageData) => {
-        const shouldScrollToBottom = (messagesHolder.scrollHeight - messagesHolder.clientHeight) - messagesHolder.scrollTop < 10;
+        const shouldScrollToBottom = messagesHolder.scrollHeight - messagesHolder.clientHeight - messagesHolder.scrollTop < 10;
         messagesHolder.appendChild(createMessageElement(messageData));
         if (shouldScrollToBottom) {
           messagesHolder.scrollTop = messagesHolder.scrollHeight;
@@ -107,18 +118,35 @@
       });
 
       messagesHolder.addEventListener("scroll", () => {
-        getMore();
+        if (messagesHolder.scrollTop < 10) {
+          getMore();
+        }
       });
 
       function getMore() {
-        if (messagesHolder.scrollTop < 10 && oldestMessageIndex > 0 && !gettingMessage) {
+        if (!gettingMessage) {
           const oldScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight;
-          gettingMessage = true;
+          gettingMessage = true; // so no duplicate messages
+
           socket.emit("GetMore", oldestMessageIndex.toString(), (messages) => {
-            messages.reverse().forEach(message => messagesHolder.insertBefore(createMessageElement(message), messagesHolder.firstChild))
+            // if no more messages display start of chat text
+            if (messages.length <= 0) {
+              const statusText = document.createElement("p");
+              statusText.classList.add("statusText");
+              statusText.textContent = "You reached the beggining of the chat.";
+              statusText.style.textAlign = "center";
+
+              messagesHolder.removeChild(loadingIcon);
+              messagesHolder.insertBefore(statusText, messagesHolder.children[0]);
+              return;
+            }
+
+            // else insert messages before loading icon
+            messages.reverse().forEach((message) => messagesHolder.insertBefore(createMessageElement(message), messagesHolder.children[1]));
             oldestMessageIndex -= messages.length;
 
-            const newScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight
+            // calculate scroll
+            const newScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight;
             messagesHolder.scrollTop = newScroll - oldScroll;
             gettingMessage = false;
           });
@@ -126,7 +154,7 @@
       }
 
       function createMessageElement(messageData) {
-        const { iconpath, displayname, username, message }  = messageData;
+        const { iconpath, displayname, username, message } = messageData;
 
         const messageDiv = document.createElement("div");
         messageDiv.classList.add("message");
@@ -152,7 +180,7 @@
         return messageDiv;
       }
 
-      let oldestMessageIndex = <%- messages.length %>
+      let oldestMessageIndex = parseInt("<%- messages.length %>");
 
       // create the last 10 messages
       getMore();

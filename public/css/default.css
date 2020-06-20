@@ -81,6 +81,31 @@ nav .title:hover {
 .loadingIcon {
   width: 30px;
   height: 30px;
-  margin-bottom: -8px;
-  margin-right: -8px;
+}
+
+.statusText {
+  color: grey;
+  width: 100%;
+  z-index: 2;
+}
+
+input[type="submit"],
+button {
+  border-radius: 3px;
+}
+
+.tooltip {
+  visibility: hidden;
+  top: -5px;
+  font-size: 14px;
+  right: 0;
+  width: fit-content;
+  background-color: black;
+  color: #fff;
+  text-align: right;
+  padding: 5px;
+  border-radius: 6px;
+
+  position: absolute;
+  z-index: 2;
 }
