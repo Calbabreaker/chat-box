@@ -2,7 +2,7 @@ const compression = require("compression");
 const express = require("express");
 require("dotenv").config();
 
-const PORT = process.env.CUSTOM_PORT;
+const PORT = process.env.CUSTOM_PORT || process.env.PORT;
 const PROXY_URL = process.env.PROXY_URL;
 global.rootDir = __dirname;
 
@@ -27,7 +27,7 @@ io.use((socket, next) => {
 
 app.use("/assets", express.static(__dirname + "/public/"));
 
-// FOR SESSION
+// FOR SESSION WITH EJS
 app.use((req, res, next) => {
   if (req.session == null) return next(new Error("Connection Invalid"));
   if (PROXY_URL) res.locals.PROXY_URL = "/" + PROXY_URL;
@@ -47,7 +47,7 @@ app.get("/", (req, res) => res.render("home"));
 // NOT FOUND
 app.use((req, res) => {
   res.status(404);
-  if (req.path.startsWith("/assets")) return res.send("Asset not found. Go back to <a href='/'>homepage</a>");
+  if (req.path.startsWith("/assets")) return res.send(`Asset not found. Go back to <a href='/${PROXY_URL}'>homepage</a>`);
   if (req.path.startsWith("/api")) return res.send("-1");
   res.render("404");
 });

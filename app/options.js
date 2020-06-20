@@ -1,4 +1,3 @@
-const random = require("crypto").randomBytes;
 const session = require("express-session");
 const redis = require("redis");
 

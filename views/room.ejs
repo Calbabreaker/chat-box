@@ -99,8 +99,9 @@
       // socket.on("disconnect", () => (location.href = "/"));
 
       socket.on("RecieveMessage", (messageData) => {
+        const shouldScrollToBottom = (messagesHolder.scrollHeight - messagesHolder.clientHeight) - messagesHolder.scrollTop < 10;
         messagesHolder.appendChild(createMessageElement(messageData));
-        if (messagesHolder.scrollTop - messagesHolder.scrollTop - messagesHolder.clientHeight < 10) {
+        if (shouldScrollToBottom) {
           messagesHolder.scrollTop = messagesHolder.scrollHeight;
         }
       });
@@ -125,7 +126,7 @@
       }
 
       function createMessageElement(messageData) {
-        const {iconpath, displayname, username, message} = messageData;
+        const { iconpath, displayname, username, message }  = messageData;
 
         const messageDiv = document.createElement("div");
         messageDiv.classList.add("message");
