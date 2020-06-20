@@ -9,21 +9,26 @@
     <%- include("../partials/nav") %>
     <div class="centeredContent">
       <form action="javascript:void(0);" method="post" onsubmit="signin();">
-        <h1 id="titleText" style="margin-bottom: 40px;" class="centeredContent">Sign in to your account</h1>
-        <label for="username">Username:</label><br />
-        <input class="textInput" id="username" name="username" type="text" /><br />
+        <h1 id="titleText" style="margin-bottom: 40px; font-size: 45px;" class="centeredContent">Sign into your account</h1>
+        <div>
+          <label for="username">Username:</label><br />
+          <input class="textInput" id="username" name="username" type="text" /><br />
+        </div>
 
-        <label for="password">Password:</label><br />
-        <input class="textInput" id="password" name="password" type="password" /><br />
+        <div>
+          <label for="password">Password:</label><br />
+          <input class="textInput" id="password" name="password" type="password" /><br />
+        </div>
 
-        <input class="submit" type="submit" value="Login" />
+        <input class="submit" id="submit" type="submit" value="Login" />
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="formLoadingIcon" />
       </form>
     </div>
 
     <script src="<%= PROXY_URL %>/assets/js/basicFuncs.js"></script>
     <script>
-      function signin() {
-        fetchAndHandle("", ["username", "password"], "<%= PROXY_URL %>/room/hub");
+      async function signin() {
+        await fetchAndHandle("", ["username", "password"], "<%= PROXY_URL %>/room/hub");
       }
     </script>
   </body>

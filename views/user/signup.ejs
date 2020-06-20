@@ -10,19 +10,28 @@
     <div class="centeredContent">
       <form action="javascript:void(0);" method="post" onsubmit="signup();">
         <h1 id="titleText" style="margin-bottom: 40px;" class="centeredContent">Create your account</h1>
-        <label for="username">Display name:</label><br />
-        <input class="textInput" id="displayname" name="displayname" type="text" /><br />
+        <div>
+          <label for="username">Display name:</label><br />
+          <input class="textInput" id="displayname" name="displayname" type="text" /><br />
+        </div>
 
-        <label for="username">Username:</label><br />
-        <input class="textInput" id="username" name="username" type="text" /><br />
+        <div>
+          <label for="username">Username:</label><br />
+          <input class="textInput" id="username" name="username" type="text" /><br />
+        </div>
 
-        <label for="password">Password:</label><br />
-        <input class="textInput" id="password" name="password" type="password" /><br />
+        <div>
+          <label for="password">Password:</label><br />
+          <input class="textInput" id="password" name="password" type="password" /><br />
+        </div>
 
-        <label for="confirmPassword">Confirm password:</label><br />
-        <input class="textInput" id="confirmPassword" name="confirmPassword" type="password" /><br />
+        <div>
+          <label for="confirmPassword">Confirm password:</label><br />
+          <input class="textInput" id="confirmPassword" name="confirmPassword" type="password" /><br />
+        </div>
 
         <input class="submit" type="submit" value="Sign Up" />
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="formLoadingIcon" />
       </form>
     </div>
 
