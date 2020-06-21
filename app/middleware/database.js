@@ -35,10 +35,10 @@ class Database {
     });
   }
 
-  getAll(sort = {}) {
+  getAll(sort = {}, projection = {}) {
     return new Promise((resolve, reject) => {
       this.database
-        .find({}, { _id: 0 })
+        .find({}, projection)
         .sort(sort)
         .exec((err, data) => {
           if (err) reject(err);

@@ -92,7 +92,7 @@
 
     <script>
       const loadingIcon = document.getElementById("messageLoadingIcon");
-      const socket = io("", { query: "roomid=<%= room.id %>", path: "<%= PROXY_URL %>/socket.io" });
+      const socket = io("", { query: "roomid=<%= room._id %>", path: "<%= PROXY_URL %>/socket.io" });
       let gettingMessage = false;
 
       const messagesHolder = document.getElementById("messages");
@@ -128,8 +128,16 @@
           gettingMessage = true; // so no duplicate messages
 
           socket.emit("GetMore", oldestMessageIndex.toString(), (messages) => {
+            // insert messages before loading icon
+            messages.reverse().forEach((message) => messagesHolder.insertBefore(createMessageElement(message), messagesHolder.children[1]));
+            oldestMessageIndex -= messages.length;
+
+            // calculate scroll
+            const newScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight;
+            messagesHolder.scrollTop = newScroll - oldScroll;
+
             // if no more messages display start of chat text
-            if (messages.length <= 0) {
+            if (messages.length <= 14) {
               const statusText = document.createElement("p");
               statusText.classList.add("statusText");
               statusText.textContent = "You reached the beggining of the chat.";
@@ -140,20 +148,13 @@
               return;
             }
 
-            // else insert messages before loading icon
-            messages.reverse().forEach((message) => messagesHolder.insertBefore(createMessageElement(message), messagesHolder.children[1]));
-            oldestMessageIndex -= messages.length;
-
-            // calculate scroll
-            const newScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight;
-            messagesHolder.scrollTop = newScroll - oldScroll;
             gettingMessage = false;
           });
         }
       }
 
       function createMessageElement(messageData) {
-        const { iconpath, displayname, username, message } = messageData;
+        const { displayname, username, message } = messageData;
 
         const messageDiv = document.createElement("div");
         messageDiv.classList.add("message");
@@ -162,7 +163,7 @@
         img.classList.add("usericon");
         img.setAttribute("alt", "user icon");
         img.setAttribute("draggable", "false");
-        img.setAttribute("src", "<%= PROXY_URL %>/assets/usercontent/" + iconpath);
+        img.setAttribute("src", "<%= PROXY_URL %>/assets/usercontent/default.webp");
 
         const messageText = document.createElement("p");
         messageText.classList.add("messagetext");
@@ -179,7 +180,7 @@
         return messageDiv;
       }
 
-      let oldestMessageIndex = parseInt("<%- messages.length %>");
+      let oldestMessageIndex = parseInt("<%- messagesCount %>");
 
       // create the last 10 messages
       getMore();
