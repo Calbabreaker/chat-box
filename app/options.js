@@ -12,7 +12,7 @@ if (process.env.REDIS_PASS != null) redisClient.auth(process.env.REDIS_PASS);
 
 // uses redis store to store the session data
 const sessionOption = {
-  secret: "asd",
+  secret: process.env.SESSION_PASS,
   cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7 * 2, // 2 weeks
     sameSite: true,
