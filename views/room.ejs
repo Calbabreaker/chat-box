@@ -163,7 +163,8 @@
         img.classList.add("usericon");
         img.setAttribute("alt", "user icon");
         img.setAttribute("draggable", "false");
-        img.setAttribute("src", "<%= PROXY_URL %>/assets/usercontent/default.webp");
+
+        img.setAttribute("src", "<%= PROXY_URL %>/assets/usercontent/usericons/<%= user.username %>.jpg");
 
         const messageText = document.createElement("p");
         messageText.classList.add("messagetext");

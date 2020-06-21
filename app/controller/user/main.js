@@ -2,6 +2,7 @@ const { validationResult } = require("express-validator");
 const argon2 = require("argon2");
 const express = require("express");
 const sharp = require("sharp");
+
 const Datastore = require(global.rootDir + "/app/middleware/database");
 
 const usersDatabase = (exports.usersDatabase = new Datastore("databases/users"));
@@ -34,10 +35,13 @@ router.post("/signup", validate.signup(), async (req, res) => {
       displayname: data.displayname,
       username: data.username,
       password: await argon2.hash(data.password, { type: argon2.argon2d }),
-      iconpath: "default.webp",
     };
 
     await usersDatabase.insert(user);
+
+    const fileDir = `${global.rootDir}/public/usercontent/usericons/`;
+    await sharp(fileDir + "default.jpg").toFile(fileDir + data.username + ".jpg"); // create icon for user
+
     req.session.user = user;
     res.json({ success: true });
   } catch (err) {
@@ -61,7 +65,7 @@ router.post("/signin", validate.signin(), async (req, res) => {
   }
 });
 
-router.put("/upload/usericon", (req, res) => {
+router.put("/upload/usericon", async (req, res) => {
   try {
     if (!req.files || req.files.usericon == null) {
       throw new Error("No files were uploaded");
@@ -70,22 +74,14 @@ router.put("/upload/usericon", (req, res) => {
     console.log(req.files.usericon);
 
     const icon = req.files.usericon;
-    if (icon.mimetype != "image/png" && icon.mimetype != "image/gif") {
+    if (icon.mimetype != "image/png" && icon.mimetype != "image/gif" && icon.mimetype != "image/jpg") {
       throw new Error("Unsupported image type.");
     }
 
     const filePath = `${global.rootDir}/public/usercontent/usericons/${req.session.user.username}.jpg`;
 
-    sharp(icon.data)
-      .resize(250, 250)
-      .toFile(filePath, (err) => {
-        if (err) {
-          console.log(err);
-          return res.status(400).json({ errors: "Error with sharp" });
-        }
-
-        res.send("OK");
-      });
+    await sharp(icon.data).resize({ width: 250, height: 250 }).jpeg({ quality: 80 }).toFile(filePath);
+    res.json({ success: true });
   } catch (err) {
     console.log(err);
     return res.status(400).json({ errors: err });
