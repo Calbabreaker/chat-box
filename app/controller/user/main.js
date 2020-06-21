@@ -84,6 +84,6 @@ router.put("/upload/usericon", async (req, res) => {
     res.json({ success: true });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ errors: err });
+    return res.status(422).json({ errors: err });
   }
 });

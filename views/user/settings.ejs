@@ -36,10 +36,7 @@
           body: formData,
         });
 
-        if (response.status.toString()[0] != "2") {
-          alert("Cannot upload file.");
-        }
-
+        await handleErrors(response);
         userIconloadingIcon.style.visibility = "hidden";
       }
     </script>

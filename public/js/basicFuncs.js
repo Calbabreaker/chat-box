@@ -12,8 +12,18 @@ async function fetchAndHandle(url, textBoxesId, loadingIcon, redirect = "") {
 
   if (loadingIcon) loadingIcon.style.visibility = "";
   const response = await fetch(url, options);
-  const data = await response.json();
+  const succeed = await handleErrors(response);
 
+  if (succeed) {
+    location.href = redirect;
+    return;
+  }
+
+  if (loadingIcon) loadingIcon.style.visibility = "hidden";
+}
+
+async function handleErrors(response) {
+  const data = await response.json();
   if (response.status === 422) {
     // loop through the errors and sets inputs iccordingly
     [...document.getElementsByClassName("textInput")].forEach((input) => {
@@ -29,13 +39,11 @@ async function fetchAndHandle(url, textBoxesId, loadingIcon, redirect = "") {
       tooltip.textContent = error.msg;
       whichErrorElement.parentElement.appendChild(tooltip);
     });
+
+    return false;
   } else if (!data.success) {
     console.log(data.errors);
-    alert("There was an unknown problem preventing signing in.");
-  } else {
-    location.href = redirect;
-    return;
-  }
-
-  if (loadingIcon) loadingIcon.style.visibility = "hidden";
+    alert("There was an unknown problem preventing from doing your action.");
+    return false;
+  } else return true;
 }
