@@ -4,7 +4,7 @@ const Datastore = require(global.rootDir + "/app/middleware/database");
 const roomsDatabase = (exports.roomsDatabase = new Datastore("databases/rooms"));
 const messagesDatabases = (exports.messagesDatabases = {});
 
-require("./io")(); // do all the io setup (diffrent folder for cleaniless)
+require("./io"); // do all the io setup (diffrent folder for cleaniless)
 
 const router = (exports.router = express.Router());
 

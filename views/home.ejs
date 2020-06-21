@@ -4,11 +4,34 @@
     <%- include("./partials/head") %>
     <title>Chat Box</title>
   </head>
+  <style>
+    @media only screen and (max-width: 650px) {
+      #mainDescription {
+        width: 360px !important;
+      }
+    }
+
+    #mainDescription {
+      width: 540px;
+      text-align: center;
+      line-height: 1.5em;
+    }
+
+    .submit {
+      font-size: 14px;
+      padding: 10px;
+      width: 200px;
+      text-align: center;
+      line-height: 1.5em;
+      margin-top: 25px;
+    }
+  </style>
   <body>
     <%- include("./partials/nav") %>
     <div class="centeredContent">
-      <h1 id="titleText">Chat Box</h1>
-      <p id="mainDescription">The best chat in the world</p>
+      <h1 class="titleText">Chat Box</h1>
+      <p class="description" id="mainDescription">Chat box is an amazing chatting app that is one of the best out there. It is for anyone who wants to chat with there friends or anyone on the internet.</p>
+      <button onclick="location.href='<%= PROXY_URL %>/signup'" class="submit">Create an account</button>
     </div>
   </body>
 </html>

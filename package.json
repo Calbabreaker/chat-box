@@ -29,7 +29,7 @@
     "nedb": "^1.8.0",
     "redis": "^3.0.2",
     "socket.io": "^2.3.0",
-    "validator": "^13.0.0"
+    "validator": "^13.1.1"
   },
   "devDependencies": {
     "redis-cli": "^1.4.0"

@@ -25,14 +25,14 @@ a {
   flex-direction: column;
 }
 
-#titleText {
-  font-size: 50px;
+.titleText {
+  font-size: 45px;
   margin-bottom: 0;
 }
 
-#mainDescription {
-  font-size: 25px;
+.description {
   margin-top: 20px;
+  color: grey;
 }
 
 /* for the nav bar  */
@@ -91,7 +91,7 @@ nav .title:hover {
 
 input[type="submit"],
 button {
-  border-radius: 3px;
+  border-radius: 4px;
 }
 
 .tooltip {
@@ -108,4 +108,11 @@ button {
 
   position: absolute;
   z-index: 2;
+}
+
+.submit {
+  border: 1px solid grey;
+  font-size: 16px;
+  width: calc(var(--size) * 5);
+  height: var(--size);
 }
