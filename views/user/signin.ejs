@@ -21,14 +21,15 @@
         </div>
 
         <input class="submit" id="submit" type="submit" value="Login" />
-        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="formLoadingIcon" />
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="formLoadingIcon" style="visibility: hidden;"/>
       </form>
     </div>
 
     <script src="<%= PROXY_URL %>/assets/js/basicFuncs.js"></script>
     <script>
+      const loadingIcon = document.getElementById("formLoadingIcon");
       async function signin() {
-        await fetchAndHandle("", ["username", "password"], "<%= PROXY_URL %>/room/hub");
+        await fetchAndHandle("", ["username", "password"], loadingIcon, "<%= PROXY_URL %>/room/hub");
       }
     </script>
   </body>

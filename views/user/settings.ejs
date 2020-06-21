@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include("../partials/head") %>
+    <title>Settings - <%= user.username%></title>
+  </head>
+  <style>
+    form {
+      margin-top: 25px;
+    }
+  </style>
+  <body>
+    <%- include("../partials/nav") %>
+    <div class="centeredContent">
+      <h1 class="titleText">Settings</h1>
+
+      <form action="javascript:void(0);" method="post" onsubmit="changeIcon();">
+        <input name="foo" type="file" id="usericon" /><br />
+        <input class="submit" id="submit" type="submit" value="Change Icon" />
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="usericonLoading" style="visibility: hidden;" />
+      </form>
+    </div>
+
+    <script src="<%= PROXY_URL %>/assets/js/basicFuncs.js"></script>
+    <script>
+      const userIconloadingIcon = document.getElementById("usericonLoading");
+      async function changeIcon() {
+        userIconloadingIcon.style.visibility = "";
+        const formData = new FormData();
+        const fileField = document.getElementById("usericon");
+
+        formData.append("usericon", fileField.files[0]);
+
+        const response = await fetch("<%= PROXY_URL %>/upload/usericon/", {
+          method: "PUT",
+          body: formData,
+        });
+
+        if (response.status.toString() != "2") {
+          alert("Cannot upload file.");
+        }
+
+        userIconloadingIcon.style.visibility = "hidden";
+      }
+    </script>
+  </body>
+</html>

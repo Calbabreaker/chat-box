@@ -3,8 +3,11 @@ const express = require("express");
 require("dotenv").config();
 
 const PORT = process.env.CUSTOM_PORT || process.env.PORT;
-const PROXY_URL = process.env.PROXY_URL;
+
 global.rootDir = __dirname;
+
+if (process.env.PROXY_URL) global.PROXY_URL = process.env.PROXY_URL;
+else global.PROXY_URL = "";
 
 // INITIALISE EVERYTHING
 const app = (module.exports.app = express());
@@ -19,6 +22,7 @@ app.set("view engine", "ejs");
 app.use(express.json());
 app.use(compression());
 app.use(options.session);
+app.use(options.fileupload);
 
 // some set up stuff with io and express
 io.use((socket, next) => {
@@ -30,8 +34,7 @@ app.use("/assets", express.static(__dirname + "/public/"));
 // FOR SESSION WITH EJS
 app.use((req, res, next) => {
   if (req.session == null) return next(new Error("Connection Invalid"));
-  if (PROXY_URL) res.locals.PROXY_URL = "/" + PROXY_URL;
-  else res.locals.PROXY_URL = "";
+  res.locals.PROXY_URL = global.PROXY_URL;
 
   res.locals.user = req.session.user;
   next();
@@ -47,7 +50,7 @@ app.get("/", (req, res) => res.render("home"));
 // NOT FOUND
 app.use((req, res) => {
   res.status(404);
-  if (req.path.startsWith("/assets")) return res.send(`Asset not found. Go back to <a href='/${PROXY_URL}'>homepage</a>`);
+  if (req.path.startsWith("/assets")) return res.send(`Asset not found. Go back to <a href='/${global.PROXY_URL}'>homepage</a>`);
   if (req.path.startsWith("/api")) return res.send("-1");
   res.render("404");
 });

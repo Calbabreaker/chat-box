@@ -33,6 +33,7 @@ a {
 .description {
   margin-top: 20px;
   color: grey;
+  line-height: 1.5em;
 }
 
 /* for the nav bar  */
@@ -81,6 +82,8 @@ nav .title:hover {
 .loadingIcon {
   width: 30px;
   height: 30px;
+  margin-bottom: -8px;
+  margin-right: -8px;
 }
 
 .statusText {

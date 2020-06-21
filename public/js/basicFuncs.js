@@ -1,10 +1,6 @@
-const loadingIcon = document.getElementById("formLoadingIcon");
-loadingIcon.style.visibility = "hidden";
-
-async function fetchAndHandle(url, textBoxesId, redirect = "") {
+async function fetchAndHandle(url, textBoxesId, loadingIcon, redirect = "") {
   const formatedData = {};
   textBoxesId.forEach((id) => (formatedData[id] = document.getElementById(id).value));
-  loadingIcon.style.visibility = "";
 
   const options = {
     method: "POST",
@@ -14,6 +10,7 @@ async function fetchAndHandle(url, textBoxesId, redirect = "") {
     body: JSON.stringify(formatedData),
   };
 
+  if (loadingIcon) loadingIcon.style.visibility = "";
   const response = await fetch(url, options);
   const data = await response.json();
 
@@ -40,5 +37,5 @@ async function fetchAndHandle(url, textBoxesId, redirect = "") {
     return;
   }
 
-  loadingIcon.style.visibility = "hidden";
+  if (loadingIcon) loadingIcon.style.visibility = "hidden";
 }

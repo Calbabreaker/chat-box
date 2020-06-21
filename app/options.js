@@ -1,5 +1,6 @@
 const session = require("express-session");
 const redis = require("redis");
+const fileupload = require("express-fileupload");
 
 const app = require(global.rootDir + "/index").app;
 const redisClient = redis.createClient();
@@ -30,4 +31,9 @@ if (isProduction) {
   app.set("trust proxy", 1);
 }
 
+const fileuploadOption = {
+  limits: { fileSize: 2 * 1024 * 1024 },
+};
+
 exports.session = session(sessionOption);
+exports.fileupload = fileupload(fileuploadOption);

@@ -19,11 +19,6 @@ form div {
   position: relative;
 }
 
-.loadingIcon {
-  margin-bottom: -8px;
-  margin-right: -8px;
-}
-
 label {
   font-size: 16px;
   text-align: left;

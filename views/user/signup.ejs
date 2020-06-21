@@ -31,14 +31,15 @@
         </div>
 
         <input class="submit" type="submit" value="Sign Up" />
-        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="formLoadingIcon" />
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="formLoadingIcon" style="visibility: hidden;" />
       </form>
     </div>
 
     <script src="<%= PROXY_URL %>/assets/js/basicFuncs.js"></script>
     <script>
+      const loadingIcon = document.getElementById("formLoadingIcon");
       async function signup() {
-        fetchAndHandle("", ["username", "password", "displayname", "confirmPassword"], "<%= PROXY_URL %>/room/hub");
+        fetchAndHandle("", ["username", "password", "displayname", "confirmPassword"], loadingIcon, "<%= PROXY_URL %>/room/hub");
       }
     </script>
   </body>

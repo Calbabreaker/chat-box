@@ -10,7 +10,7 @@ const router = (exports.router = express.Router());
 
 router.get("/room/:roomid", async (req, res) => {
   try {
-    if (req.session.user == null) return res.redirect("/signup");
+    if (req.session.user == null) return res.redirect(global.PROXY_URL + "/signup");
     const roomid = req.params.roomid;
     const room = await roomsDatabase.checkProperty({ _id: roomid });
     if (room.found) {
@@ -18,7 +18,7 @@ router.get("/room/:roomid", async (req, res) => {
       res.render("room", { room: room.doc, messagesCount: count });
     } else res.status(404).render("404");
   } catch (err) {
-    console.error(err);
+    console.log(err);
     return res.status(400).json({ errors: "Failed getting from database" });
   }
 });
@@ -45,4 +45,4 @@ async function startSetup() {
   });
 }
 
-startSetup().catch(console.error);
+startSetup().catch(console.log);

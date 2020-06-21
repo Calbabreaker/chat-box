@@ -22,7 +22,7 @@ io.on("connection", async (socket) => {
         io.to(connectedRoom._id).emit("RecieveMessage", messageData);
         await messagesDatabases[connectedRoom._id].insert(messageData); // adds to the connect rooms message database
       } catch (err) {
-        console.error(err);
+        console.log(err);
         socket.disconnect();
       }
     });
@@ -35,13 +35,13 @@ io.on("connection", async (socket) => {
         const messages = await messagesDatabases[connectedRoom._id].getAll({ timestamp: 1 });
         getCallback(messages.slice(fromWhere - 15 >= 0 ? fromWhere - 15 : 0, fromWhere));
       } catch (err) {
-        console.error(err);
+        console.log(err);
         socket.disconnect();
       }
     });
   } catch (err) {
     // disconnects the socket when theres error
-    console.error(err);
+    console.log(err);
     socket.disconnect();
   }
 });

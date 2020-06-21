@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const argon2 = require("argon2");
 const express = require("express");
+const sharp = require("sharp");
 const Datastore = require(global.rootDir + "/app/middleware/database");
 
 const usersDatabase = (exports.usersDatabase = new Datastore("databases/users"));
@@ -15,6 +16,11 @@ router.get("/signup", (req, res) => res.render("user/signup"));
 router.get("/signout", async (req, res) => {
   if (req.session.user != null) req.session.destroy();
   res.redirect("/");
+});
+
+router.get("/settings", (req, res) => {
+  if (req.session.user == null) return res.redirect(global.PROXY_URL + "/signup");
+  res.render("user/settings");
 });
 
 // POST REQUESTS
@@ -35,7 +41,7 @@ router.post("/signup", validate.signup(), async (req, res) => {
     req.session.user = user;
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.log(err);
     return res.status(400).json({ errors: "Failed inserting into database." });
   }
 });
@@ -50,7 +56,38 @@ router.post("/signin", validate.signin(), async (req, res) => {
     req.session.user = user;
     res.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.log(err);
     return res.status(400).json({ errors: "Failed getting from database" });
+  }
+});
+
+router.put("/upload/usericon", (req, res) => {
+  try {
+    if (!req.files || req.files.usericon == null) {
+      throw new Error("No files were uploaded");
+    }
+
+    console.log(req.files.usericon);
+
+    const icon = req.files.usericon;
+    if (icon.mimetype != "image/png" && icon.mimetype != "image/gif") {
+      throw new Error("Unsupported image type.");
+    }
+
+    const filePath = `${global.rootDir}/public/usercontent/usericons/${req.session.user.username}.jpg`;
+
+    sharp(icon.data)
+      .resize(250, 250)
+      .toFile(filePath, (err) => {
+        if (err) {
+          console.log(err);
+          return res.status(400).json({ errors: "Error with sharp" });
+        }
+
+        res.send("OK");
+      });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ errors: err });
   }
 });
