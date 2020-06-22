@@ -28,6 +28,11 @@ async function handleErrors(response) {
     // loop through the errors and sets inputs iccordingly
     [...document.getElementsByClassName("textInput")].forEach((input) => {
       input.style.backgroundColor = "#96ff9e";
+      const div = input.parentElement;
+      const tooltip = input.parentElement.getElementsByClassName("tooltip")[0];
+      if (tooltip != null) {
+        div.removeChild(tooltip);
+      }
     });
 
     data.errors.forEach((error) => {

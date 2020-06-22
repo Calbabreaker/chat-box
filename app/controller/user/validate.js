@@ -9,10 +9,10 @@ exports.signup = () => {
     check("displayname").stripLow().isLength({ min: 3, max: 32 }).withMessage("Must be between 3 and 32 characters").escape(),
     check("username")
       .customSanitizer(toLowerCase)
-      .custom((value) => !/\s/.test(value))
+      .isLength({ min: 3, max: 32 })
       .withMessage("Must be between 3 and 32 characters")
       .isAlphanumeric()
-      .withMessage("Must contain valid alpha numeric characters")
+      .withMessage("Must contain valid alpha numeric characters")      
       .custom(async (value) => {
         const check = await usersDatabase.checkProperty({ username: value });
         if (check.found) throw new Error("Username Already taken");
@@ -47,4 +47,6 @@ exports.signin = () => {
   ];
 };
 
-toLowerCase = (value) => value.toLowerCase();
+toLowerCase = (value) => {
+    return value.toLowerCase();
+};

@@ -19,8 +19,8 @@ io.on("connection", async (socket) => {
         if (!validator.isLength(msg, { min: 1, max: 500 }) || !/\S/.test(msg)) throw new Error("Invalid message");
         const user = socket.request.session.user;
         const messageData = { message: validator.escape(msg), timestamp: Date.now(), username: user.username, displayname: user.displayname };
-        io.to(connectedRoom._id).emit("RecieveMessage", messageData);
         await messagesDatabases[connectedRoom._id].insert(messageData); // adds to the connect rooms message database
+        io.to(connectedRoom._id).emit("RecieveMessage", messageData);
       } catch (err) {
         console.log(err);
         socket.disconnect();

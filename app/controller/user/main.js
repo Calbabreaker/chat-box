@@ -1,9 +1,8 @@
-const { validationResult } = require("express-validator");
+const { vald, validateChain } = require(global.rootDir + "/app/middleware/validator");
+const Datastore = require(global.rootDir + "/app/middleware/database");
 const argon2 = require("argon2");
 const express = require("express");
 const sharp = require("sharp");
-
-const Datastore = require(global.rootDir + "/app/middleware/database");
 
 const usersDatabase = (exports.usersDatabase = new Datastore("databases/users"));
 const router = (exports.router = express.Router());
@@ -26,11 +25,36 @@ router.get("/settings", (req, res) => {
 
 // POST REQUESTS
 // signup creates user with hased password and all the stuff
-router.post("/signup", validate.signup(), async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
+router.post("/signup", async (req, res) => {
   try {
     const data = req.body;
+    data.username = vald.toLowerCase(data.username);
+    const check = await usersDatabase.checkProperty({ username: data.username });
+
+    const result = await validateChain()
+      .check("username", data.username)
+      .validate((v) => vald.isLength(v, { min: 3, max: 32 }), "Must be between 3 and 32 characters")
+      .validate(vald.isAlphanumeric, "Must contain valid alpha numeric characters")
+      .validate(() => !check.found, "Username already taken")
+
+      .check("displayname", data.displayname)
+      .sanitize(vald.stripLow)
+      .validate((v) => vald.isLength(v, { min: 3, max: 32 }), "Must be between 3 and 32 characters")
+      .sanitize(vald.escape)
+      .callSanz((v) => (data.displayname = v))
+
+      .check("password", data.password)
+      .validate((v) => vald.isLength(v, { min: 8, max: 250 }), "Must be between 8 and 250 characters")
+      .check("confirmPassword", data.confirmPassword)
+      .validate((v) => v === data.password, "Password confirmation does not match password")
+
+      .pack();
+
+    const errors = result.getErrors();
+    if (errors.length > 0) {
+      return res.status(422).json({ errors, success: false });
+    }
+
     const user = {
       displayname: data.displayname,
       username: data.username,
@@ -40,50 +64,70 @@ router.post("/signup", validate.signup(), async (req, res) => {
     await usersDatabase.insert(user);
 
     const fileDir = `${global.rootDir}/public/usercontent/usericons/`;
-    await sharp(fileDir + "default.jpg").toFile(fileDir + data.username + ".jpg"); // create icon for user
+    await sharp(fileDir + "default.png").toFile(fileDir + data.username + ".png"); // create icon for user
 
     req.session.user = user;
     res.json({ success: true });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ errors: "Failed inserting into database." });
+    return res.status(400).json({ errors: "Unknown error", success: false });
   }
 });
 
 // signin checks password hash with hash in database (uses argon2)
 router.post("/signin", validate.signin(), async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) return res.status(422).json({ errors: errors.array() });
   try {
     const data = req.body;
-    const user = (await usersDatabase.checkProperty({ username: data.username })).doc;
+    data.username = vald.toLowerCase(data.username);
+    const check = await usersDatabase.checkProperty({ username: data.username });
+
+    const result = await validateChain()
+      .check("username", data.username)
+      .validate(() => check.found, "Username not found")
+
+      .check("password", data.password)
+      .validate(() => check.found, "Invalid username")
+      .validate(async (v) => {
+        return await argon2.verify(check.doc.password, v);
+      }, "Wrong password")
+
+      .pack();
+
+    const errors = result.getErrors();
+    if (errors.length > 0) {
+      return res.status(422).json({ errors, success: false });
+    }
+
+    const user = check.doc;
     req.session.user = user;
     res.json({ success: true });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ errors: "Failed getting from database" });
+    return res.status(400).json({ errors: "Unknown error", success: false });
   }
 });
 
 router.put("/upload/usericon", async (req, res) => {
   try {
-    if (!req.files || req.files.usericon == null) {
-      throw new Error("No files were uploaded");
+    req.files = {};
+    const result = await validateChain()
+      .check("usericon", req.files.usericon)
+      .validate((v) => v != null, "No files were uploaded")
+      .validate((v) => v.mimetype == "image/png" || v.mimetype == "image/gif" || v.mimetype == "image/jpg" || v.mimetype == "image/jpeg", "Invalid image type")
+
+      .pack();
+
+    const filePath = `${global.rootDir}/public/usercontent/usericons/${req.session.user.username}.png`;
+
+    const errors = result.getErrors();
+    if (errors.length > 0) {
+      return res.status(422).json({ errors, success: false });
     }
 
-    console.log(req.files.usericon);
-
-    const icon = req.files.usericon;
-    if (icon.mimetype != "image/png" && icon.mimetype != "image/gif" && icon.mimetype != "image/jpg") {
-      throw new Error("Unsupported image type.");
-    }
-
-    const filePath = `${global.rootDir}/public/usercontent/usericons/${req.session.user.username}.jpg`;
-
-    await sharp(icon.data).resize({ width: 250, height: 250 }).jpeg({ quality: 80 }).toFile(filePath);
+    await sharp(icon.data).resize({ width: 250, height: 250 }).png({ quality: 80 }).toFile(filePath);
     res.json({ success: true });
   } catch (err) {
     console.log(err);
-    return res.status(422).json({ errors: err });
+    return res.status(422).json({ errors: "Unknown error", success: false });
   }
 });
