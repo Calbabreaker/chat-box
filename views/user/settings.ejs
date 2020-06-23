@@ -45,7 +45,12 @@
           body: formData,
         });
 
-        await handleErrors(response);
+        const result = await handleErrors(response);
+        if (result) {
+          alert("Sucess!");
+          location.reload(false);
+        }
+
         userIconloadingIcon.style.visibility = "hidden";
       }
     </script>

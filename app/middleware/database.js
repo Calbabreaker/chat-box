@@ -49,9 +49,9 @@ class Database {
 
   insert(toInsert) {
     return new Promise((resolve, reject) => {
-      this.database.insert(toInsert, (err) => {
+      this.database.insert(toInsert, (err, doc) => {
         if (err) reject(err);
-        else resolve();
+        else resolve(doc);
       });
     });
   }

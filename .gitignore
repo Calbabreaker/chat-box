@@ -2,8 +2,6 @@ node_modules/
 databases/
 
 public/usercontent/*
-!public/usercontent/usericons/
-public/usercontent/usericons/*
 
 .env
 !default.*

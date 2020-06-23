@@ -158,7 +158,7 @@
       }
 
       function createMessageElement(messageData) {
-        const { displayname, username, message } = messageData;
+        const { displayname, username, message, userid } = messageData;
 
         const messageDiv = document.createElement("div");
         messageDiv.classList.add("message");
@@ -166,7 +166,7 @@
         const img = document.createElement("img");
         img.classList.add("usericon");
         img.setAttribute("draggable", "false");
-        img.setAttribute("src", "<%= PROXY_URL %>/assets/usercontent/usericons/<%= user.username %>.jpg");
+        img.setAttribute("src", `<%= PROXY_URL %>/assets/usercontent/${userid}/photo.png`);
 
         const messageText = document.createElement("p");
         messageText.classList.add("messagetext");

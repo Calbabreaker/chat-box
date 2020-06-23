@@ -3,6 +3,7 @@ const Datastore = require(global.rootDir + "/app/middleware/database");
 const argon2 = require("argon2");
 const express = require("express");
 const sharp = require("sharp");
+const fs = require("fs");
 
 const usersDatabase = (exports.usersDatabase = new Datastore("databases/users"));
 const router = (exports.router = express.Router());
@@ -57,12 +58,13 @@ router.post("/signup", async (req, res) => {
       password: await argon2.hash(data.password, { type: argon2.argon2d }),
     };
 
-    await usersDatabase.insert(user);
+    const userDoc = await usersDatabase.insert(user);
+    const fileDir = `${global.rootDir}/public/usercontent/`;
+    const userDir = `${fileDir}${userDoc._id}/`;
+    await fs.promises.mkdir(userDir);
+    await fs.promises.copyFile(fileDir + "default.png", userDir + "photo.png");
 
-    const fileDir = `${global.rootDir}/public/usercontent/usericons/`;
-    await sharp(fileDir + "default.png").toFile(fileDir + data.username + ".png"); // create icon for user
-
-    req.session.user = user;
+    req.session.user = userDoc;
     res.json({ success: true });
   } catch (err) {
     console.log(err);
@@ -111,15 +113,14 @@ router.put("/upload/usericon", async (req, res) => {
 
       .pack();
 
-    const filePath = `${global.rootDir}/public/usercontent/usericons/${req.session.user.username}.png`;
-
     const errors = result.getErrors();
     if (errors.length > 0) return res.status(422).json({ errors, success: false });
 
-    await sharp(icon.data).resize({ width: 250, height: 250 }).png({ quality: 80 }).toFile(filePath);
+    const photoDir = `${global.rootDir}/public/usercontent/${req.session.user._id}/photo.png`;
+    await sharp(req.files.usericon.data).resize({ width: 250, height: 250 }).png({ quality: 80 }).toFile(photoDir);
     res.json({ success: true });
   } catch (err) {
     console.log(err);
-    return res.status(422).json({ errors: "Unknown error", success: false });
+    return res.status(400).json({ errors: "Unknown error", success: false });
   }
 });
