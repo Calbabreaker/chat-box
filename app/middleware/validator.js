@@ -9,15 +9,17 @@ vald.toLowerCase = (str) => {
 // FORMAT: errors=[{msg, param}, ...]
 
 class ValidationChain {
-  constructor() {
+  constructor(validateObj) {
     this.data = [];
     this.callStack = [];
+    this.validateObj = validateObj;
   }
 
-  _check(name, value) {
+  _check(name) {
     this.data.unshift({}); // adds to front of array
-    this.data[0].param = name;
-    this.data[0].value = value;
+    const currentObj = this.data[0];
+    currentObj.param = name;
+    currentObj.value = this.validateObj[name];
     return true;
   }
 
@@ -50,12 +52,6 @@ class ValidationChain {
     return this;
   }
 
-  // call this to get value from sanitization
-  callSanz(func) {
-    this.callStack[0].push(async () => func(this.data[0].value));
-    return this;
-  }
-
   // call this at the end of the call chain
   async pack() {
     for (let calls of this.callStack) {
@@ -68,6 +64,11 @@ class ValidationChain {
     }
 
     this.callStack = [];
+
+    this.data.forEach((property) => {
+      this.validateObj[property.name] = property.value;
+    });
+
     return this;
   }
 
@@ -88,6 +89,6 @@ class ValidationChain {
   }
 }
 
-exports.validateChain = () => {
-  return new ValidationChain();
+exports.validateChain = (validateObj) => {
+  return new ValidationChain(validateObj);
 };

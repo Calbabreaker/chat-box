@@ -32,7 +32,7 @@ io.on("connection", async (socket) => {
         const fromWhere = validator.toInt(fromWhereString);
         if (isNaN(fromWhere)) throw new Error("fromWhere not valid integer");
 
-        const messages = await messagesDatabases[connectedRoom._id].getAll({ timestamp: 1 });
+        const messages = await messagesDatabases[connectedRoom._id].getAll({ timestamp: 1 }); // return the last 15 messages sorted by the timestamp
         getCallback(messages.slice(fromWhere - 15 >= 0 ? fromWhere - 15 : 0, fromWhere));
       } catch (err) {
         console.log(err);

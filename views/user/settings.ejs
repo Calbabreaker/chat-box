@@ -8,6 +8,10 @@
     form {
       margin-top: 25px;
     }
+
+    #usericon {
+      margin-top: 10px;
+    }
   </style>
   <body>
     <%- include("../partials/nav") %>
@@ -15,9 +19,14 @@
       <h1 class="titleText">Settings</h1>
 
       <form action="javascript:void(0);" method="post" onsubmit="changeIcon();">
-        <input name="foo" type="file" id="usericon" /><br />
-        <input class="submit" id="submit" type="submit" value="Change Icon" />
-        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="usericonLoading" style="visibility: hidden;" />
+        <div>
+          <label for="usericon">Profile picture: </label><br />
+          <input name="usericon" type="file" id="usericon" size="60" /><br />
+        </div>
+
+        <input type="submit" value="Change Icon" />
+
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="usericonLoading" />
       </form>
     </div>
 

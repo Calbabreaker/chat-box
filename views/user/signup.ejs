@@ -3,8 +3,9 @@
   <head>
     <%- include("../partials/head") %>
     <title>Chat Box - Sign Up</title>
-    <link rel="stylesheet" href="<%= PROXY_URL %>/assets/css/bigform.css" />
   </head>
+  <link rel="stylesheet" href="<%= PROXY_URL %>/assets/css/bigforms.css" />
+  </style>
   <body>
     <%- include("../partials/nav") %>
     <div class="centeredContent">
@@ -30,8 +31,8 @@
           <input class="textInput" id="confirmPassword" name="confirmPassword" type="password" /><br />
         </div>
 
-        <input class="submit" type="submit" value="Sign Up" />
-        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="formLoadingIcon" style="visibility: hidden;" />
+        <input type="submit" value="Sign Up" />
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="formLoadingIcon" />
       </form>
     </div>
 

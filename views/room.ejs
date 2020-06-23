@@ -76,6 +76,10 @@
         margin-right: auto;
         margin-bottom: 5px;
       }
+
+      .loadingIcon {
+        visibility: visible;
+      }
     </style>
   </head>
   <body>
@@ -161,9 +165,7 @@
 
         const img = document.createElement("img");
         img.classList.add("usericon");
-        img.setAttribute("alt", "user icon");
         img.setAttribute("draggable", "false");
-
         img.setAttribute("src", "<%= PROXY_URL %>/assets/usercontent/usericons/<%= user.username %>.jpg");
 
         const messageText = document.createElement("p");

@@ -7,8 +7,6 @@ const sharp = require("sharp");
 const usersDatabase = (exports.usersDatabase = new Datastore("databases/users"));
 const router = (exports.router = express.Router());
 
-const validate = require("./validate");
-
 // GET REQUESTS / VIEWS
 router.get("/signin", (req, res) => res.render("user/signin"));
 router.get("/signup", (req, res) => res.render("user/signup"));
@@ -31,29 +29,27 @@ router.post("/signup", async (req, res) => {
     data.username = vald.toLowerCase(data.username);
     const check = await usersDatabase.checkProperty({ username: data.username });
 
-    const result = await validateChain()
-      .check("username", data.username)
+    const result = await validateChain(data)
+      .check("username")
       .validate((v) => vald.isLength(v, { min: 3, max: 32 }), "Must be between 3 and 32 characters")
       .validate(vald.isAlphanumeric, "Must contain valid alpha numeric characters")
       .validate(() => !check.found, "Username already taken")
 
-      .check("displayname", data.displayname)
+      .check("displayname")
       .sanitize(vald.stripLow)
       .validate((v) => vald.isLength(v, { min: 3, max: 32 }), "Must be between 3 and 32 characters")
       .sanitize(vald.escape)
-      .callSanz((v) => (data.displayname = v))
 
-      .check("password", data.password)
+      .check("password")
       .validate((v) => vald.isLength(v, { min: 8, max: 250 }), "Must be between 8 and 250 characters")
-      .check("confirmPassword", data.confirmPassword)
+
+      .check("confirmPassword")
       .validate((v) => v === data.password, "Password confirmation does not match password")
 
       .pack();
 
     const errors = result.getErrors();
-    if (errors.length > 0) {
-      return res.status(422).json({ errors, success: false });
-    }
+    if (errors.length > 0) return res.status(422).json({ errors, success: false });
 
     const user = {
       displayname: data.displayname,
@@ -75,17 +71,17 @@ router.post("/signup", async (req, res) => {
 });
 
 // signin checks password hash with hash in database (uses argon2)
-router.post("/signin", validate.signin(), async (req, res) => {
+router.post("/signin", async (req, res) => {
   try {
     const data = req.body;
     data.username = vald.toLowerCase(data.username);
     const check = await usersDatabase.checkProperty({ username: data.username });
 
-    const result = await validateChain()
-      .check("username", data.username)
+    const result = await validateChain(data)
+      .check("username")
       .validate(() => check.found, "Username not found")
 
-      .check("password", data.password)
+      .check("password")
       .validate(() => check.found, "Invalid username")
       .validate(async (v) => {
         return await argon2.verify(check.doc.password, v);
@@ -94,9 +90,7 @@ router.post("/signin", validate.signin(), async (req, res) => {
       .pack();
 
     const errors = result.getErrors();
-    if (errors.length > 0) {
-      return res.status(422).json({ errors, success: false });
-    }
+    if (errors.length > 0) return res.status(422).json({ errors, success: false });
 
     const user = check.doc;
     req.session.user = user;
@@ -109,9 +103,9 @@ router.post("/signin", validate.signin(), async (req, res) => {
 
 router.put("/upload/usericon", async (req, res) => {
   try {
-    req.files = {};
-    const result = await validateChain()
-      .check("usericon", req.files.usericon)
+    if (req.files == null) req.files = {};
+    const result = await validateChain(req.files)
+      .check("usericon")
       .validate((v) => v != null, "No files were uploaded")
       .validate((v) => v.mimetype == "image/png" || v.mimetype == "image/gif" || v.mimetype == "image/jpg" || v.mimetype == "image/jpeg", "Invalid image type")
 
@@ -120,9 +114,7 @@ router.put("/upload/usericon", async (req, res) => {
     const filePath = `${global.rootDir}/public/usercontent/usericons/${req.session.user.username}.png`;
 
     const errors = result.getErrors();
-    if (errors.length > 0) {
-      return res.status(422).json({ errors, success: false });
-    }
+    if (errors.length > 0) return res.status(422).json({ errors, success: false });
 
     await sharp(icon.data).resize({ width: 250, height: 250 }).png({ quality: 80 }).toFile(filePath);
     res.json({ success: true });
