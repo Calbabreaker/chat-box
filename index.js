@@ -50,7 +50,7 @@ app.get("/", (req, res) => res.render("home"));
 // NOT FOUND
 app.use((req, res) => {
   res.status(404);
-  if (req.path.startsWith("/assets")) return res.send(`Asset not found. Go back to <a href='/${global.PROXY_URL}'>homepage</a>`);
+  if (req.path.startsWith("/assets")) return res.send(`Asset not found. Go back to <a href='${global.PROXY_URL}'>homepage</a>`);
   if (req.path.startsWith("/api")) return res.send("-1");
   res.render("404");
 });
