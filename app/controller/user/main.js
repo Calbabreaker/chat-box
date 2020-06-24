@@ -14,7 +14,7 @@ router.get("/signup", (req, res) => res.render("user/signup"));
 
 router.get("/signout", async (req, res) => {
   if (req.session.user != null) req.session.destroy();
-  res.redirect("/");
+  res.redirect(global.PROXY_URL + "/");
 });
 
 router.get("/settings", (req, res) => {
