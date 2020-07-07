@@ -105,13 +105,14 @@ router.post("/signin", async (req, res) => {
   }
 });
 
-router.put("/upload/usericon", async (req, res) => {
+// changing of user data by the settings page
+router.put("/usericon", async (req, res) => {
   try {
     if (req.files == null) req.files = {};
     const result = await validateChain(req.files)
       .check("usericon")
       .validate((v) => v != null, "No files were uploaded")
-      .validate((v) => v.mimetype == "image/png" || v.mimetype == "image/gif" || v.mimetype == "image/jpg" || v.mimetype == "image/jpeg", "Invalid image type")
+      .validate((v) => v.mimetype == "image/png" || v.mimetype == "image/gif" || v.mimetype == "image/jpg" || v.mimetype == "image/jpeg" || v.mimetype == "image/webp", "Invalid image type")
 
       .pack();
 
@@ -120,6 +121,29 @@ router.put("/upload/usericon", async (req, res) => {
 
     const photoDir = `${global.rootDir}/public/usercontent/${req.session.user._id}/photo.png`;
     await sharp(req.files.usericon.data).resize({ width: 250, height: 250 }).png({ quality: 80 }).toFile(photoDir);
+    res.json({ success: true });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ errors: "Unknown error", success: false });
+  }
+});
+
+router.put("/displayname", async (req, res) => {
+  try {
+    const result = await validateChain(req.body)
+      .check("displayname")
+      .sanitize(vald.stripLow)
+      .validate((v) => vald.isLength(v, { min: 1 }), "Empty field")
+      .validate((v) => vald.isLength(v, { max: 60 }), "Must be less than 60 characters")
+      .sanitize(vald.escape)
+
+      .pack();
+
+    const errors = result.getErrors();
+    if (errors.length > 0) return res.status(422).json({ errors, success: false });
+
+    await usersDatabase.update({ username: req.session.user.username }, { $set: { displayname: req.body.displayname } });
+    req.session.user.displayname = req.body.displayname;
     res.json({ success: true });
   } catch (err) {
     console.log(err);

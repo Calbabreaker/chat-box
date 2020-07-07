@@ -9,7 +9,7 @@
       margin-top: 25px;
     }
 
-    #usericon {
+    input {
       margin-top: 10px;
     }
   </style>
@@ -18,29 +18,38 @@
     <div class="centeredContent">
       <h1 class="titleText">Settings</h1>
 
+      <form action="javascript:void(0);" method="post" onsubmit="changeDisplayName();">
+        <div>
+          <label for="displayname">Display name: </label><br />
+          <input name="displayname" type="text" placeholder="Your new display name" id="displayname" /><br />
+        </div>
+
+        <input type="submit" value="Change Display Name" />
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="usericonLoading" />
+      </form>
+
       <form action="javascript:void(0);" method="post" onsubmit="changeIcon();">
         <div>
           <label for="usericon">Profile picture: </label><br />
-          <input name="usericon" type="file" id="usericon" size="60" /><br />
+          <input name="usericon" type="file" id="usericon" /><br />
         </div>
 
         <input type="submit" value="Change Icon" />
-
-        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="usericonLoading" />
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="displaynameLoading" />
       </form>
     </div>
 
     <script src="<%= PROXY_URL %>/assets/js/basicFuncs.js"></script>
     <script>
-      const userIconloadingIcon = document.getElementById("usericonLoading");
       async function changeIcon() {
-        userIconloadingIcon.style.visibility = "visible";
+        const loadingIcon = document.getElementById("usericonLoading");
+        loadingIcon.style.visibility = "visible";
         const formData = new FormData();
         const fileField = document.getElementById("usericon");
 
         formData.append("usericon", fileField.files[0]);
 
-        const response = await fetch("<%= PROXY_URL %>/upload/usericon/", {
+        const response = await fetch("<%= PROXY_URL %>/usericon/", {
           method: "PUT",
           body: formData,
         });
@@ -51,7 +60,17 @@
           location.reload(false);
         }
 
-        userIconloadingIcon.style.visibility = "hidden";
+        loadingIcon.style.visibility = "hidden";
+      }
+
+      async function changeDisplayName() {
+        const loadingIcon = document.getElementById("displaynameLoading");
+        const suceeded = await fetchAndHandle("<%= PROXY_URL %>/displayname/", ["displayname"], loadingIcon, null, "PUT");
+
+        if (suceeded) {
+          location.reload(false);
+          alert("Sucess!");
+        }
       }
     </script>
   </body>

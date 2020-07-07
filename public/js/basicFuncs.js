@@ -1,9 +1,9 @@
-async function fetchAndHandle(url, textBoxesId, loadingIcon, redirect = "") {
+async function fetchAndHandle(url, textBoxesId, loadingIcon, redirect, method = "POST") {
   const formatedData = {};
   textBoxesId.forEach((id) => (formatedData[id] = document.getElementById(id).value));
 
   const options = {
-    method: "POST",
+    method: method,
     headers: {
       "Content-Type": "application/json",
     },
@@ -12,14 +12,11 @@ async function fetchAndHandle(url, textBoxesId, loadingIcon, redirect = "") {
 
   if (loadingIcon) loadingIcon.style.visibility = "visible";
   const response = await fetch(url, options);
-  const succeed = await handleErrors(response);
+  const succeeded = await handleErrors(response);
 
-  if (succeed) {
-    location.href = redirect;
-    return;
-  }
-
+  if (succeeded && redirect != null) location.href = redirect;
   if (loadingIcon) loadingIcon.style.visibility = "hidden";
+  return succeeded;
 }
 
 async function handleErrors(response) {
