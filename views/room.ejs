@@ -104,7 +104,7 @@
 
       function sendMessage() {
         const messageText = messageInput.value;
-        if (/\S/.test(messageText) && messageText.length >= 1 && messageText.length <= 500) {
+        if (/\S/.test(messageText) && messageText.length >= 1 && messageText.length <= 1000) {
           socket.emit("SendMessage", messageText);
           messageInput.value = "";
         }
@@ -140,7 +140,7 @@
             const newScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight;
             messagesHolder.scrollTop = newScroll - oldScroll;
 
-            // if no more messages display start of chat text
+            // if no more messages display start of chat text and remove loading icon
             if (messages.length <= 14) {
               const statusText = document.createElement("p");
               statusText.classList.add("statusText");
@@ -152,6 +152,7 @@
               return;
             }
 
+            // no duplicate messages
             gettingMessage = false;
           });
         }
@@ -167,6 +168,7 @@
         img.classList.add("usericon");
         img.setAttribute("draggable", "false");
         img.setAttribute("src", `<%= PROXY_URL %>/assets/usercontent/${userid}/photo.png`);
+        img.setAttribute("title", "@" + username);
 
         const messageText = document.createElement("p");
         messageText.classList.add("messagetext");
@@ -174,7 +176,6 @@
 
         const displayNameText = document.createElement("p");
         displayNameText.classList.add("displayname");
-        displayNameText.setAttribute("title", "@" + username);
         displayNameText.innerHTML = displayname;
 
         messageDiv.appendChild(img);

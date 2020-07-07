@@ -3,7 +3,7 @@ const Datastore = require(global.rootDir + "/app/middleware/database");
 const argon2 = require("argon2");
 const express = require("express");
 const sharp = require("sharp");
-const fs = require("fs");
+const fs = require("fs-extra");
 
 const usersDatabase = (exports.usersDatabase = new Datastore("databases/users"));
 const router = (exports.router = express.Router());
@@ -32,17 +32,21 @@ router.post("/signup", async (req, res) => {
 
     const result = await validateChain(data)
       .check("username")
-      .validate((v) => vald.isLength(v, { min: 3, max: 32 }), "Must be between 3 and 32 characters")
+      .sanitize(vald.stripLow)
+      .validate((v) => vald.isLength(v, { min: 1 }), "Empty field")
+      .validate((v) => vald.isLength(v, { max: 40 }), "Must be less than 40 characters")
       .validate(vald.isAlphanumeric, "Must contain valid alpha numeric characters")
       .validate(() => !check.found, "Username already taken")
 
       .check("displayname")
       .sanitize(vald.stripLow)
-      .validate((v) => vald.isLength(v, { min: 3, max: 32 }), "Must be between 3 and 32 characters")
+      .validate((v) => vald.isLength(v, { min: 1 }), "Empty field")
+      .validate((v) => vald.isLength(v, { max: 60 }), "Must be less than 60 characters")
       .sanitize(vald.escape)
 
       .check("password")
-      .validate((v) => vald.isLength(v, { min: 8, max: 250 }), "Must be between 8 and 250 characters")
+      .validate((v) => vald.isLength(v, { min: 8 }), "Must be greater than 8 characters")
+      .validate((v) => vald.isLength(v, { max: 500 }), "Must be less than 500 characters")
 
       .check("confirmPassword")
       .validate((v) => v === data.password, "Password confirmation does not match password")
@@ -59,10 +63,8 @@ router.post("/signup", async (req, res) => {
     };
 
     const userDoc = await usersDatabase.insert(user);
-    const fileDir = `${global.rootDir}/public/usercontent/`;
-    const userDir = `${fileDir}${userDoc._id}/`;
-    await fs.promises.mkdir(userDir);
-    await fs.promises.copyFile(fileDir + "default.png", userDir + "photo.png");
+    const fileDir = `${global.rootDir}/public/usercontent`;
+    await fs.copy(`${fileDir}/default/`, `${fileDir}/${userDoc._id}/`);
 
     req.session.user = userDoc;
     res.json({ success: true });

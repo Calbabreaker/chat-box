@@ -10,7 +10,7 @@ async function fetchAndHandle(url, textBoxesId, loadingIcon, redirect = "") {
     body: JSON.stringify(formatedData),
   };
 
-  if (loadingIcon) loadingIcon.style.visibility = "";
+  if (loadingIcon) loadingIcon.style.visibility = "visible";
   const response = await fetch(url, options);
   const succeed = await handleErrors(response);
 
@@ -25,7 +25,7 @@ async function fetchAndHandle(url, textBoxesId, loadingIcon, redirect = "") {
 async function handleErrors(response) {
   const data = await response.json();
   if (response.status === 422) {
-    // loop through the errors and sets inputs iccordingly
+    // loop through the errors and sets inputs accordingly
     [...document.getElementsByClassName("textInput")].forEach((input) => {
       input.style.backgroundColor = "#96ff9e";
       const div = input.parentElement;

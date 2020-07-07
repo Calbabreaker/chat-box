@@ -14,9 +14,9 @@ io.on("connection", async (socket) => {
     socket.join(connectedRoom._id);
     socket.on("SendMessage", async (msg) => {
       try {
-        // check if message is between 1 and 500 characters and doesn't have only spaces then it cleans xss
+        // check if message is between 1 and 1000 characters and doesn't have only spaces then it cleans xss
         msg = validator.stripLow(msg);
-        if (!validator.isLength(msg, { min: 1, max: 500 }) || !/\S/.test(msg)) throw new Error("Invalid message");
+        if (!validator.isLength(msg, { min: 1, max: 1000 }) || !/\S/.test(msg)) throw new Error("Invalid message");
         const user = socket.request.session.user;
         const messageData = { message: validator.escape(msg), timestamp: Date.now(), username: user.username, displayname: user.displayname, userid: user._id };
         await messagesDatabases[connectedRoom._id].insert(messageData); // adds to the connect rooms message database

@@ -4,5 +4,5 @@ databases/
 public/usercontent/*
 
 .env
-!default.*
+!default
 notes.*
