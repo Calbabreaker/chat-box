@@ -12,6 +12,15 @@
     input {
       margin-top: 10px;
     }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 240px;
+    }
+
+    .tooltip {
+      font-size: 10px;
+    }
   </style>
   <body>
     <%- include("../partials/nav") %>
@@ -25,7 +34,18 @@
         </div>
 
         <input type="submit" value="Change Display Name" />
-        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="usericonLoading" />
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="displaynameLoading" />
+      </form>
+
+      <form action="javascript:void(0);" method="post" onsubmit="changePassword();">
+        <div>
+          <label for="password">Password: </label><br />
+          <input name="password" type="password" placeholder="Your new password" id="password" /><br />
+        </div>
+        <div><input name="confirmPassword" type="password" placeholder="Confirm your password" id="confirmPassword" /><br /></div>
+
+        <input type="submit" value="Change Password" />
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="passwordLoading" />
       </form>
 
       <form action="javascript:void(0);" method="post" onsubmit="changeIcon();">
@@ -35,12 +55,19 @@
         </div>
 
         <input type="submit" value="Change Icon" />
-        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="displaynameLoading" />
+        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="usericonLoading" />
       </form>
     </div>
 
     <script src="<%= PROXY_URL %>/assets/js/basicFuncs.js"></script>
     <script>
+      function alertReload(successCondition) {
+        if (successCondition) {
+          location.reload(false);
+          alert("Sucess!");
+        }
+      }
+
       async function changeIcon() {
         const loadingIcon = document.getElementById("usericonLoading");
         loadingIcon.style.visibility = "visible";
@@ -54,23 +81,21 @@
           body: formData,
         });
 
-        const result = await handleErrors(response);
-        if (result) {
-          alert("Sucess!");
-          location.reload(false);
-        }
-
+        const succeeded = await handleErrors(response, ["usericon"]);
+        alertReload(succeeded);
         loadingIcon.style.visibility = "hidden";
       }
 
       async function changeDisplayName() {
         const loadingIcon = document.getElementById("displaynameLoading");
         const suceeded = await fetchAndHandle("<%= PROXY_URL %>/displayname/", ["displayname"], loadingIcon, null, "PUT");
+        alertReload(suceeded);
+      }
 
-        if (suceeded) {
-          location.reload(false);
-          alert("Sucess!");
-        }
+      async function changePassword() {
+        const loadingIcon = document.getElementById("passwordLoading");
+        const suceeded = await fetchAndHandle("<%= PROXY_URL %>/password/", ["password", "confirmPassword"], loadingIcon, null, "PUT");
+        alertReload(suceeded);
       }
     </script>
   </body>

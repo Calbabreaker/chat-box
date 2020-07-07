@@ -4,7 +4,7 @@ A chatting app with accounts just like the thousands of ones out there except pr
 
 ## Demo
 
-Working demo on [Server](https://naltonsoftware.com/chatbox).
+Working demo on the [Server](https://naltonsoftware.com/chatbox).
 
 ## Instalation
 

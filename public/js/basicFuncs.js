@@ -12,18 +12,19 @@ async function fetchAndHandle(url, textBoxesId, loadingIcon, redirect, method = 
 
   if (loadingIcon) loadingIcon.style.visibility = "visible";
   const response = await fetch(url, options);
-  const succeeded = await handleErrors(response);
+  const succeeded = await handleErrors(response, textBoxesId);
 
   if (succeeded && redirect != null) location.href = redirect;
   if (loadingIcon) loadingIcon.style.visibility = "hidden";
   return succeeded;
 }
 
-async function handleErrors(response) {
+async function handleErrors(response, textBoxesId) {
   const data = await response.json();
   if (response.status === 422) {
     // loop through the errors and sets inputs accordingly
-    [...document.getElementsByClassName("textInput")].forEach((input) => {
+    textBoxesId.forEach((id) => {
+      const input = document.getElementById(id);
       input.style.backgroundColor = "#96ff9e";
       const div = input.parentElement;
       const tooltip = input.parentElement.getElementsByClassName("tooltip")[0];

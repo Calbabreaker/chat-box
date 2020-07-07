@@ -33,6 +33,7 @@ router.post("/signup", async (req, res) => {
     const result = await validateChain(data)
       .check("username")
       .sanitize(vald.stripLow)
+      .sanitize(vald.trim)
       .validate((v) => vald.isLength(v, { min: 1 }), "Empty field")
       .validate((v) => vald.isLength(v, { max: 40 }), "Must be less than 40 characters")
       .validate(vald.isAlphanumeric, "Must contain valid alpha numeric characters")
@@ -130,7 +131,8 @@ router.put("/usericon", async (req, res) => {
 
 router.put("/displayname", async (req, res) => {
   try {
-    const result = await validateChain(req.body)
+    const data = req.body;
+    const result = await validateChain(data)
       .check("displayname")
       .sanitize(vald.stripLow)
       .validate((v) => vald.isLength(v, { min: 1 }), "Empty field")
@@ -142,8 +144,33 @@ router.put("/displayname", async (req, res) => {
     const errors = result.getErrors();
     if (errors.length > 0) return res.status(422).json({ errors, success: false });
 
-    await usersDatabase.update({ username: req.session.user.username }, { $set: { displayname: req.body.displayname } });
-    req.session.user.displayname = req.body.displayname;
+    await usersDatabase.update({ username: req.session.user.username }, { $set: { displayname: data.displayname } });
+    req.session.user.displayname = data.displayname;
+    res.json({ success: true });
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({ errors: "Unknown error", success: false });
+  }
+});
+
+router.put("/password", async (req, res) => {
+  try {
+    const data = req.body;
+    const result = await validateChain(data)
+      .check("password")
+      .validate((v) => vald.isLength(v, { min: 8 }), "Must be greater than 8 characters")
+      .validate((v) => vald.isLength(v, { max: 500 }), "Must be less than 500 characters")
+
+      .check("confirmPassword")
+      .validate((v) => v === data.password, "Password confirmation does not match password")
+
+      .pack();
+
+    const errors = result.getErrors();
+    if (errors.length > 0) return res.status(422).json({ errors, success: false });
+
+    const password = await argon2.hash(data.password, { type: argon2.argon2d });
+    await usersDatabase.update({ username: req.session.user.username }, { $set: { password: password } });
     res.json({ success: true });
   } catch (err) {
     console.log(err);
