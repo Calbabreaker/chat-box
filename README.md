@@ -37,7 +37,7 @@ Start the node server:
 npm start
 ```
 
-You might want to edit the .env to your likings (explenation in .env_sample)
+You might want to edit the .env to your likings (explanation in .env_sample)
 
 ## LICENSE
 
