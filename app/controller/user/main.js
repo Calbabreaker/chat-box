@@ -145,7 +145,7 @@ router.put("/displayname", async (req, res) => {
     if (errors.length > 0) return res.status(422).json({ errors, success: false });
 
     await usersDatabase.update({ username: req.session.user.username }, { $set: { displayname: data.displayname } });
-    req.session.user.displayname = data.displayname;
+    req.session.destroy();
     res.json({ success: true });
   } catch (err) {
     console.log(err);
@@ -171,6 +171,7 @@ router.put("/password", async (req, res) => {
 
     const password = await argon2.hash(data.password, { type: argon2.argon2d });
     await usersDatabase.update({ username: req.session.user.username }, { $set: { password: password } });
+    req.session.destroy();
     res.json({ success: true });
   } catch (err) {
     console.log(err);
