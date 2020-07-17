@@ -1,4 +1,3 @@
-const { vald, validateChain } = require(global.rootDir + "/app/middleware/validator");
 const Datastore = require(global.rootDir + "/app/middleware/database");
 const argon2 = require("argon2");
 const express = require("express");

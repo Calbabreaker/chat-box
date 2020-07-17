@@ -6,6 +6,10 @@ vald.toLowerCase = (str) => {
   }
 };
 
+vald.wait = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
 // FORMAT: errors=[{msg, param}, ...]
 
 class ValidationChain {

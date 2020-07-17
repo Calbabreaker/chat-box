@@ -75,7 +75,8 @@
         display: block;
         margin-left: auto;
         margin-right: auto;
-        margin-bottom: 5px;
+        margin-bottom: 10px;
+        margin-top: 10px;
       }
 
       .loadingIcon {
@@ -142,10 +143,10 @@
             messagesHolder.scrollTop = newScroll - oldScroll;
 
             // if no more messages display start of chat text and remove loading icon
-            if (messages.length <= 14) {
+            if (messages.length < 15) {
               const statusText = document.createElement("p");
               statusText.classList.add("statusText");
-              statusText.textContent = "You reached the beggining of the chat.";
+              statusText.textContent = "You reached the beggining of the chat";
               statusText.style.textAlign = "center";
 
               messagesHolder.removeChild(loadingIcon);
