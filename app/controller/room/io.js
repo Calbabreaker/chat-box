@@ -16,6 +16,7 @@ io.on("connection", async (socket) => {
       try {
         // check if message is between 1 and 1000 characters and doesn't have only spaces then it cleans xss
         msg = vald.stripLow(msg);
+        msg = msg.replace(/(^( |&nbsp;|<br>)+)|(( |&nbsp;)+$)/g, ""); // removes all the whitespace at the start and end of message
         if (!vald.isLength(msg, { min: 1, max: 1000 }) || !/\S/.test(msg)) throw "Invalid message";
         const user = socket.request.session.user;
         msg = vald.escape(msg);
