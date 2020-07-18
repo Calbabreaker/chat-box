@@ -108,19 +108,16 @@
       window.onload = () => messageInput.focus();
 
       function textboxPaste(event) {
-        // setTimeout(() => {
-        //   // remove all the html formatting excpect for b i and u
-        //   messageInput.innerHTML = messageInput.innerHTML.replace(/(?!<[ibu]>)<[^<>]+>/g, "");
-        // });
+        setTimeout(() => {
+          // remove all the html formatting excpect for b i and u
+          messageInput.innerHTML = messageInput.innerHTML.replace(/(?!<[ibu]>)<[^<>]+>/g, "");
+        });
       }
 
       function textboxKeyDown(event) {
-        if (event.key == "Enter") {
+        if (event.key == "Enter" && !event.ctrlKey && !event.shiftKey) {
           let message = messageInput.innerHTML;
-          message = message
-            .replace(/&lt;/g, "<")
-            .replace(/&gt;/g, ">")
-            .replace(/&amp;/g, "&")
+          message = message.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 
           sendMessage(message);
           event.preventDefault();
