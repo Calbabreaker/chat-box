@@ -1,16 +1,16 @@
 # Chat Box!
 
-A chatting app with accounts just like the thousands of ones out there except probaly worse.
+A chatting app with accounts just like the thousands of ones out there but probaly worse.
 
 ## Demo
 
-Working demo on the [Server](https://naltonsoftware.com/chatbox).
+Working demo on the [Website](https://naltonsoftware.com/chatbox).
 
-## Instalation
+## Installation
 
 If you want to use this, then give credit.
 
-First clone and dowload depedencies:
+First clone and download dependencies:
 
 ```sh
 git clone https://github.com/Calbabreaker/chat-box.git
@@ -18,7 +18,7 @@ cd chat-box
 npm install
 ```
 
-Then you need to get a redis-server (linux Ubuntu):
+Then you need to get a redis-server (linux):
 
 ```sh
 sudo apt update
@@ -37,8 +37,6 @@ Start the node server:
 npm start
 ```
 
+For more detail instructions please see this [post](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-18-04) (for redis) and this [post](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-16-04) (for nodejs).
+
 You might want to edit the .env to your likings (explanation in .env_sample)
-
-## LICENSE
-
-GPL-3.0
