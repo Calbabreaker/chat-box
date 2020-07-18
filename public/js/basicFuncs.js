@@ -50,3 +50,10 @@ async function handleErrors(response, textBoxesId) {
     return false;
   } else return true;
 }
+
+function setCaretPos(element, caretPos) {
+  if (element.selectionStart != null) {
+    element.focus();
+    element.setSelectionRange(caretPos, caretPos);
+  } else element.focus();
+}

@@ -19,6 +19,7 @@ io.on("connection", async (socket) => {
         if (!vald.isLength(msg, { min: 1, max: 1000 }) || !/\S/.test(msg)) throw "Invalid message";
         const user = socket.request.session.user;
         msg = vald.escape(msg);
+        msg = vald.unescapeSpecialFormatting(msg);
 
         const messageData = { message: msg, timestamp: Date.now(), username: user.username, displayname: user.displayname, userid: user._id };
         await messagesDatabases[connectedRoom._id].insert(messageData); // adds to the connect rooms message database
@@ -31,7 +32,7 @@ io.on("connection", async (socket) => {
 
     socket.on("GetMore", async (fromWhereString, getCallback) => {
       try {
-        await vald.wait(2000);
+        // await vald.wait(2000);
         const fromWhere = vald.toInt(fromWhereString);
         if (isNaN(fromWhere)) throw "fromWhere not valid integer";
 

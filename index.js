@@ -6,7 +6,7 @@ const PORT = process.env.CUSTOM_PORT || process.env.PORT;
 
 global.rootDir = __dirname;
 
-if (process.env.PROXY_URL) global.PROXY_URL = process.env.PROXY_URL;
+if (process.env.PROXY_URL != null) global.PROXY_URL = process.env.PROXY_URL;
 else global.PROXY_URL = "";
 
 // INITIALISE EVERYTHING
@@ -24,7 +24,7 @@ app.use(compression());
 app.use(options.session);
 app.use(options.fileupload);
 
-// some set up stuff with io and express
+// set up session with io
 io.use((socket, next) => {
   options.session(socket.request, socket.request.res || {}, next);
 });
@@ -50,7 +50,7 @@ app.get("/", (req, res) => res.render("home"));
 // NOT FOUND
 app.use((req, res) => {
   res.status(404);
-  if (req.path.startsWith("/assets")) return res.send(`Asset not found. Go back to <a href='${global.PROXY_URL}'>homepage</a>`);
+  if (req.path.startsWith("/assets")) return res.send(`Asset not found. Go back to <a href='/${global.PROXY_URL}'>homepage</a>`);
   if (req.path.startsWith("/api")) return res.send("-1");
   res.render("404");
 });
