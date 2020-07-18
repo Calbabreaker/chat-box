@@ -125,7 +125,7 @@
       }
 
       function sendMessage(messageText) {
-        if (/\S/.test(messageText) && messageText.length >= 1 && messageText.length <= 1000) {
+        if (messageText.length >= 1 && messageText.length <= 1000) {
           socket.emit("SendMessage", messageText);
           messageInput.innerHTML = "";
         }
@@ -162,7 +162,7 @@
             messagesHolder.scrollTop = newScroll - oldScroll;
 
             // if no more messages display start of chat text and remove loading icon
-            if (messages.length < 15) {
+            if (messages.length < 30) {
               const statusText = document.createElement("p");
               statusText.classList.add("statusText");
               statusText.textContent = "You reached the beggining of the chat";

@@ -121,7 +121,7 @@ router.put("/usericon", async (req, res) => {
     if (errors.length > 0) return res.status(422).json({ errors, success: false });
 
     const photoDir = `${global.rootDir}/public/usercontent/${req.session.user._id}/photo.png`;
-    await sharp(req.files.usericon.data).resize({ width: 250, height: 250 }).png({ quality: 80 }).toFile(photoDir);
+    await sharp(req.files.usericon.data).resize({ width: 100, height: 100 }).png({ quality: 80 }).toFile(photoDir);
     res.json({ success: true });
   } catch (err) {
     console.log(err);

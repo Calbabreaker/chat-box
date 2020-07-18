@@ -13,7 +13,7 @@ vald.wait = (ms) => {
 // replaces all the specific escaped tags back into the tag for formatting of messages
 vald.unescapeSpecialFormatting = (str) => {
   if (typeof str == "string") {
-    str = str.replace(/&amp;nbsp;/g, "&nbps"); // have in between spaces in p
+    str = str.replace(/&amp;nbsp;/g, "&nbsp"); // have in between spaces in p
 
     // matches a string with escaped <> of the specified types and replaces it with the unescaped version
     str = str.replace(/&lt;(&#x2F;|)(u|i|b)&gt;/g, (match) => `<${match.substr(4, match.length - 8).replace("&#x2F;", "/")}>`);

@@ -38,7 +38,7 @@ io.on("connection", async (socket) => {
 
         // return the last 15 messages sorted by the timestamp to function parameter
         const messages = await messagesDatabases[connectedRoom._id].getAll({ timestamp: 1 });
-        getCallback(messages.slice(fromWhere - 15 >= 0 ? fromWhere - 15 : 0, fromWhere));
+        getCallback(messages.slice(fromWhere - 30 >= 0 ? fromWhere - 30 : 0, fromWhere));
       } catch (err) {
         console.log(err);
         socket.disconnect();
