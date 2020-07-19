@@ -5,6 +5,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <title>Chat Box - <%- room.name %></title>
     <style>
+      body {
+        overflow-y: auto;
+      }
+
       #inputHolder {
         background: #26262b;
         width: 100%;
@@ -21,6 +25,17 @@
         color: rgb(223, 223, 223);
         padding: 10px;
         display: inline-block;
+        max-height: 128px;
+        overflow-y: auto;
+      }
+
+      .fakeTextInput[placeholder]:empty::before {
+        content: attr(placeholder);
+        color: #888;
+      }
+
+      .fakeTextInput[placeholder]:empty:focus::before {
+        content: "";
       }
 
       #chat {
@@ -28,7 +43,6 @@
         display: table-cell;
         vertical-align: bottom;
         height: calc(100vh - 55px);
-        max-height: calc(100vh - 55px);
         width: 100vw;
         border-radius: 5px 5px 0 0;
         word-break: break-word;
@@ -36,7 +50,7 @@
 
       #messages {
         overflow-y: auto;
-        max-height: calc(100vh - 108px);
+        max-height: calc(100vh - 120px);
         padding-right: 5px;
       }
 
@@ -87,7 +101,7 @@
         <div style="display: none;"></div>
       </div>
       <div id="inputHolder">
-        <div class="fakeTextInput" id="messageInput" contenteditable="true" onkeydown="textboxKeyDown(event);" onpaste="textboxPaste(event);"></div>
+        <div class="fakeTextInput" id="messageInput" contenteditable="true" placeholder="Send a message" onkeydown="textboxKeyDown(event);" onpaste="textboxPaste(event);"></div>
       </div>
     </div>
 
@@ -99,17 +113,25 @@
       const messagesHolder = document.getElementById("messages");
       const messageInput = document.getElementById("messageInput");
 
-      window.onload = () => messageInput.focus();
+      function checkHoldingModifers(event) {
+        return event.ctrlKey || event.shiftKey || event.altKey;
+      }
+
+      window.addEventListener("keydown", (event) => {
+        if (!checkHoldingModifers(event)) {
+          messageInput.focus();
+        }
+      });
 
       function textboxPaste(event) {
-        setTimeout(() => {
-          // remove all the html formatting excpect for b i and u
-          messageInput.innerHTML = messageInput.innerHTML.replace(/(?!<[ibu]>)<[^<>]+>/g, "");
-        });
+        // remove formatting from paste
+        event.preventDefault();
+        const text = event.clipboardData.getData("text/plain");
+        document.execCommand("insertText", false, text);
       }
 
       function textboxKeyDown(event) {
-        if (event.key == "Enter" && !event.ctrlKey && !event.shiftKey) {
+        if (event.key == "Enter" && !checkHoldingModifers(event)) {
           let message = messageInput.innerHTML;
           message = message.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
 
@@ -119,7 +141,7 @@
       }
 
       function sendMessage(messageText) {
-        messageText = messageText.replace(/(^( |&nbsp;|<br>)+)|(( |&nbsp;)+$)/g, ""); // removes all the whitespace at the start and end of message
+        messageText = messageText.replace(/(^( |&nbsp;|<br>)+)|(( |&nbsp;|<br>)+$)/g, ""); // removes all the whitespace at the start and end of message
         if (messageText.length >= 1 && messageText.length <= 1000) {
           socket.emit("SendMessage", messageText);
           messageInput.innerHTML = "";
