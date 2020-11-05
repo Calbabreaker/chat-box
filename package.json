@@ -4,8 +4,8 @@
   "description": "Simple Chatbox built in node",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "rediscli": "node ./node_modules/redis-cli/index.js"
+    "start": "sudo node index.js",
+    "reset": "sudo rm -r databases/; sudo rm -r public/usercontent/!(default)"
   },
   "keywords": [
     "chat",
@@ -33,9 +33,7 @@
     "socket.io": "^2.3.0",
     "validator": "^13.1.1"
   },
-  "devDependencies": {
-    "redis-cli": "^1.4.0"
-  },
+  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Calbabreaker/chat-box.git"
