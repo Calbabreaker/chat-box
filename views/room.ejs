@@ -2,7 +2,11 @@
 <html lang="en">
   <head>
     <%- include("./partials/head") %>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"
+      integrity="sha512-2RDFHqfLZW8IhPRvQYmK9bTLfj/hddxGXQAred2wNZGkrKQkLGj8RCkXfRJPHlDerdHHIzTFaahq4s/P4V6Qig=="
+      crossorigin="anonymous"
+    ></script>
     <title>Chat Box - <%- room.name %></title>
     <style>
       body {
@@ -97,17 +101,31 @@
     <%- include("./partials/nav") %>
     <div id="chat">
       <div id="messages">
-        <img src="<%= PROXY_URL %>/assets/images/loading.svg" class="loadingIcon" id="messageLoadingIcon" />
-        <div style="display: none;"></div>
+        <img
+          src="<%= PROXY_URL %>/assets/images/loading.svg"
+          class="loadingIcon"
+          id="messageLoadingIcon"
+        />
+        <div style="display: none"></div>
       </div>
       <div id="inputHolder">
-        <div class="fakeTextInput" id="messageInput" contenteditable="true" placeholder="Send a message" onkeydown="textboxKeyDown(event);" onpaste="textboxPaste(event);"></div>
+        <div
+          class="fakeTextInput"
+          id="messageInput"
+          contenteditable="true"
+          placeholder="Send a message"
+          onkeydown="textboxKeyDown(event);"
+          onpaste="textboxPaste(event);"
+        ></div>
       </div>
     </div>
 
     <script>
       const loadingIcon = document.getElementById("messageLoadingIcon");
-      const socket = io("", { query: "roomid=<%= room._id %>", path: "<%= PROXY_URL %>/socket.io" });
+      const socket = io("", {
+        query: "roomid=<%= room._id %>",
+        path: "<%= PROXY_URL %>/socket.io",
+      });
       let gettingMessage = false;
 
       const messagesHolder = document.getElementById("messages");
@@ -133,7 +151,10 @@
       function textboxKeyDown(event) {
         if (event.key == "Enter" && !checkHoldingModifers(event)) {
           let message = messageInput.innerHTML;
-          message = message.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+          message = message
+            .replace(/&lt;/g, "<")
+            .replace(/&gt;/g, ">")
+            .replace(/&amp;/g, "&");
 
           sendMessage(message);
           event.preventDefault();
@@ -141,7 +162,10 @@
       }
 
       function sendMessage(messageText) {
-        messageText = messageText.replace(/(^( |&nbsp;|<br>)+)|(( |&nbsp;|<br>)+$)/g, ""); // removes all the whitespace at the start and end of message
+        messageText = messageText.replace(
+          /(^( |&nbsp;|<br>)+)|(( |&nbsp;|<br>)+$)/g,
+          ""
+        ); // removes all the whitespace at the start and end of message
         if (messageText.length >= 1 && messageText.length <= 1000) {
           socket.emit("SendMessage", messageText);
           messageInput.innerHTML = "";
@@ -151,7 +175,11 @@
       // socket.on("disconnect", () => (location.href = "/"));
 
       socket.on("RecieveMessage", (messageData) => {
-        const shouldScrollToBottom = messagesHolder.scrollHeight - messagesHolder.clientHeight - messagesHolder.scrollTop < 10;
+        const shouldScrollToBottom =
+          messagesHolder.scrollHeight -
+            messagesHolder.clientHeight -
+            messagesHolder.scrollTop <
+          10;
         messagesHolder.appendChild(createMessageElement(messageData));
         if (shouldScrollToBottom) {
           messagesHolder.scrollTop = messagesHolder.scrollHeight;
@@ -166,16 +194,25 @@
 
       function getMore() {
         if (!gettingMessage) {
-          const oldScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight;
+          const oldScroll =
+            messagesHolder.scrollHeight - messagesHolder.clientHeight;
           gettingMessage = true; // so no duplicate messages
 
           socket.emit("GetMore", oldestMessageIndex.toString(), (messages) => {
             // insert messages before loading icon
-            messages.reverse().forEach((message) => messagesHolder.insertBefore(createMessageElement(message), messagesHolder.children[1]));
+            messages
+              .reverse()
+              .forEach((message) =>
+                messagesHolder.insertBefore(
+                  createMessageElement(message),
+                  messagesHolder.children[1]
+                )
+              );
             oldestMessageIndex -= messages.length;
 
             // calculate scroll
-            const newScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight;
+            const newScroll =
+              messagesHolder.scrollHeight - messagesHolder.clientHeight;
             messagesHolder.scrollTop = newScroll - oldScroll;
 
             // if no more messages display start of chat text and remove loading icon
@@ -186,7 +223,10 @@
               statusText.style.textAlign = "center";
 
               messagesHolder.removeChild(loadingIcon);
-              messagesHolder.insertBefore(statusText, messagesHolder.children[0]);
+              messagesHolder.insertBefore(
+                statusText,
+                messagesHolder.children[0]
+              );
               return;
             }
 
@@ -205,7 +245,10 @@
         const img = document.createElement("img");
         img.classList.add("usericon");
         img.setAttribute("draggable", "false");
-        img.setAttribute("src", `<%= PROXY_URL %>/assets/usercontent/${userid}/photo.png`);
+        img.setAttribute(
+          "src",
+          `<%= PROXY_URL %>/assets/usercontent/${userid}/photo.png`
+        );
         img.setAttribute("title", "@" + username);
 
         const messageText = document.createElement("p");
