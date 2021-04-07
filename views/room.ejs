@@ -239,13 +239,15 @@
                 img.setAttribute("draggable", "false");
                 img.setAttribute("src", `<%= PROXY_URL %>/assets/usercontent/${userid}/photo.png`);
                 img.setAttribute("title", "@" + username);
-                img.onclick = () => {
-                    const shouldDelete = confirm("Delete the message?");
-                    if (shouldDelete) {
-                        socket.emit("DeleteMessage", messageData._id);
-                        messagesHolder.removeChild(messageDiv);
-                    }
-                };
+                if (userid == "<%- user._id %>") {
+                    img.onclick = () => {
+                        const shouldDelete = confirm("Delete the message?");
+                        if (shouldDelete) {
+                            socket.emit("DeleteMessage", messageData._id);
+                            messagesHolder.removeChild(messageDiv);
+                        }
+                    };
+                }
 
                 const messageText = document.createElement("p");
                 messageText.classList.add("messagetext");
