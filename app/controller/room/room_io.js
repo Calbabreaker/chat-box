@@ -44,6 +44,15 @@ io.on("connection", async (socket) => {
             }
         });
 
+        socket.on("DeleteMessage", async (id) => {
+            try {
+                messagesDatabases[connectedRoom._id].removeByProperty({ _id: id });
+            } catch (err) {
+                console.log(err);
+                socket.disconnect();
+            }
+        });
+
         socket.on("GetMore", async (fromWhereString, getCallback) => {
             try {
                 // await vald.wait(2000);

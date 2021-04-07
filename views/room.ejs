@@ -1,275 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <%- include("./partials/head") %>
-    <script
-      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"
-      integrity="sha512-2RDFHqfLZW8IhPRvQYmK9bTLfj/hddxGXQAred2wNZGkrKQkLGj8RCkXfRJPHlDerdHHIzTFaahq4s/P4V6Qig=="
-      crossorigin="anonymous"
-    ></script>
-    <title>Chat Box - <%- room.name %></title>
-    <style>
-      body {
-        overflow-y: hidden;
-      }
-
-      #inputHolder {
-        background: #26262b;
-        width: 100%;
-        padding: 10px;
-      }
-
-      .fakeTextInput {
-        background-color: #40444b;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        width: calc(100%);
-        min-height: 40px;
-        color: rgb(223, 223, 223);
-        padding: 10px;
-        display: inline-block;
-        max-height: 128px;
-        overflow-y: auto;
-      }
-
-      .fakeTextInput[placeholder]:empty::before {
-        content: attr(placeholder);
-        color: #888;
-      }
-
-      .fakeTextInput[placeholder]:empty:focus::before {
-        content: "";
-      }
-
-      #chat {
-        background-color: #36393f;
-        display: table-cell;
-        vertical-align: bottom;
-        height: calc(100vh - 55px);
-        width: 100vw;
-        border-radius: 5px 5px 0 0;
-        word-break: break-word;
-      }
-
-      #messages {
-        overflow-y: auto;
-        max-height: calc(100vh - 120px);
-        padding-right: 5px;
-      }
-
-      .message {
-        padding-top: 5px;
-      }
-
-      .message p {
-        margin-left: 60px;
-        margin-top: -45px;
-      }
-
-      .message .messagetext {
-        color: rgb(196, 196, 196);
-        margin-top: 5px;
-      }
-
-      .message .displayname {
-        margin-bottom: 0;
-      }
-
-      .message .usericon {
-        width: 40px;
-        user-select: none;
-        height: 40px;
-        border-radius: 40px;
-        margin-left: 10px;
-      }
-
-      #messageLoadingIcon {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 10px;
-        margin-top: 10px;
-      }
-
-      .loadingIcon {
-        visibility: visible;
-      }
-    </style>
-  </head>
-  <body>
-    <%- include("./partials/nav") %>
-    <div id="chat">
-      <div id="messages">
-        <img
-          src="<%= PROXY_URL %>/assets/images/loading.svg"
-          class="loadingIcon"
-          id="messageLoadingIcon"
-        />
-        <div style="display: none"></div>
-      </div>
-      <div id="inputHolder">
-        <div
-          class="fakeTextInput"
-          id="messageInput"
-          contenteditable="true"
-          placeholder="Send a message"
-          onkeydown="textboxKeyDown(event);"
-          onpaste="textboxPaste(event);"
-        ></div>
-      </div>
-    </div>
-
-    <script>
-      const loadingIcon = document.getElementById("messageLoadingIcon");
-      const socket = io("", {
-        query: "roomid=<%= room._id %>",
-        path: "<%= PROXY_URL %>/socket.io",
-      });
-      let gettingMessage = false;
-
-      const messagesHolder = document.getElementById("messages");
-      const messageInput = document.getElementById("messageInput");
-
-      function checkHoldingModifers(event) {
-        return event.ctrlKey || event.shiftKey || event.altKey;
-      }
-
-      window.addEventListener("keydown", (event) => {
-        if (!checkHoldingModifers(event)) {
-          messageInput.focus();
-        }
-      });
-
-      function textboxPaste(event) {
-        // remove formatting from paste
-        event.preventDefault();
-        const text = event.clipboardData.getData("text/plain");
-        document.execCommand("insertText", false, text);
-      }
-
-      function textboxKeyDown(event) {
-        if (event.key == "Enter" && !checkHoldingModifers(event)) {
-          let message = messageInput.innerHTML;
-          message = message
-            .replace(/&lt;/g, "<")
-            .replace(/&gt;/g, ">")
-            .replace(/&amp;/g, "&");
-
-          sendMessage(message);
-          event.preventDefault();
-        }
-      }
-
-      function sendMessage(messageText) {
-        // removes all the whitespace at the start and end of message
-        messageText = messageText.replace(
-          /(^( |&nbsp;|<br>)+)|(( |&nbsp;|<br>)+$)/g,
-          ""
-        );
-        if (messageText.length >= 1 && messageText.length <= 1000) {
-          socket.emit("SendMessage", messageText);
-          messageInput.innerHTML = "";
-        }
-      }
-
-      // socket.on("disconnect", () => (location.href = "/"));
-
-      socket.on("RecieveMessage", (messageData) => {
-        const shouldScrollToBottom =
-          messagesHolder.scrollHeight -
-            messagesHolder.clientHeight -
-            messagesHolder.scrollTop <
-          10;
-        messagesHolder.appendChild(createMessageElement(messageData));
-        if (shouldScrollToBottom) {
-          messagesHolder.scrollTop = messagesHolder.scrollHeight;
-        }
-      });
-
-      messagesHolder.addEventListener("scroll", () => {
-        if (messagesHolder.scrollTop < 10) {
-          getMore();
-        }
-      });
-
-      function getMore() {
-        if (!gettingMessage) {
-          const oldScroll =
-            messagesHolder.scrollHeight - messagesHolder.clientHeight;
-          gettingMessage = true; // so no duplicate messages
-
-          socket.emit("GetMore", oldestMessageIndex.toString(), (messages) => {
-            // insert messages before loading icon
-            messages
-              .reverse()
-              .forEach((message) =>
-                messagesHolder.insertBefore(
-                  createMessageElement(message),
-                  messagesHolder.children[1]
-                )
-              );
-            oldestMessageIndex -= messages.length;
-
-            // calculate scroll
-            const newScroll =
-              messagesHolder.scrollHeight - messagesHolder.clientHeight;
-            messagesHolder.scrollTop = newScroll - oldScroll;
-
-            // if no more messages display start of chat text and remove loading icon
-            if (messages.length < 30) {
-              const statusText = document.createElement("p");
-              statusText.classList.add("statusText");
-              statusText.textContent = "You reached the beginning of the chat";
-              statusText.style.textAlign = "center";
-
-              messagesHolder.removeChild(loadingIcon);
-              messagesHolder.insertBefore(
-                statusText,
-                messagesHolder.children[0]
-              );
-              return;
+    <head>
+        <%- include("./partials/head") %>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.3/socket.io.js"
+            integrity="sha512-2RDFHqfLZW8IhPRvQYmK9bTLfj/hddxGXQAred2wNZGkrKQkLGj8RCkXfRJPHlDerdHHIzTFaahq4s/P4V6Qig=="
+            crossorigin="anonymous"
+        ></script>
+        <title>Chat Box - <%- room.name %></title>
+        <style>
+            body {
+                overflow-y: hidden;
             }
 
-            // no duplicate messages
-            gettingMessage = false;
-          });
-        }
-      }
+            #inputHolder {
+                background: #26262b;
+                width: 100%;
+                padding: 10px;
+            }
 
-      function createMessageElement(messageData) {
-        const { displayname, username, message, userid } = messageData;
+            .fakeTextInput {
+                background-color: #40444b;
+                border: none;
+                border-radius: 4px;
+                font-size: 16px;
+                width: calc(100%);
+                min-height: 40px;
+                color: rgb(223, 223, 223);
+                padding: 10px;
+                display: inline-block;
+                max-height: 128px;
+                overflow-y: auto;
+            }
 
-        const messageDiv = document.createElement("div");
-        messageDiv.classList.add("message");
+            .fakeTextInput[placeholder]:empty::before {
+                content: attr(placeholder);
+                color: #888;
+            }
 
-        const img = document.createElement("img");
-        img.classList.add("usericon");
-        img.setAttribute("draggable", "false");
-        img.setAttribute(
-          "src",
-          `<%= PROXY_URL %>/assets/usercontent/${userid}/photo.png`
-        );
-        img.setAttribute("title", "@" + username);
+            .fakeTextInput[placeholder]:empty:focus::before {
+                content: "";
+            }
 
-        const messageText = document.createElement("p");
-        messageText.classList.add("messagetext");
-        messageText.innerHTML = message;
+            #chat {
+                background-color: #36393f;
+                display: table-cell;
+                vertical-align: bottom;
+                height: calc(100vh - 55px);
+                width: 100vw;
+                border-radius: 5px 5px 0 0;
+                word-break: break-word;
+            }
 
-        const displayNameText = document.createElement("p");
-        displayNameText.classList.add("displayname");
-        displayNameText.innerHTML = displayname;
+            #messages {
+                overflow-y: auto;
+                max-height: calc(100vh - 120px);
+                padding-right: 5px;
+            }
 
-        messageDiv.appendChild(img);
-        messageDiv.appendChild(displayNameText);
-        messageDiv.appendChild(messageText);
-        return messageDiv;
-      }
+            .message {
+                padding-top: 5px;
+            }
 
-      let oldestMessageIndex = parseInt("<%- messagesCount %>");
+            .message p {
+                margin-left: 60px;
+                margin-top: -45px;
+            }
 
-      // create the last 10 messages
-      getMore();
-    </script>
-  </body>
+            .message .messagetext {
+                color: rgb(196, 196, 196);
+                margin-top: 5px;
+            }
+
+            .message .displayname {
+                margin-bottom: 0;
+            }
+
+            .message .usericon {
+                width: 40px;
+                user-select: none;
+                height: 40px;
+                border-radius: 40px;
+                margin-left: 10px;
+            }
+
+            #messageLoadingIcon {
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+                margin-bottom: 10px;
+                margin-top: 10px;
+            }
+
+            .loadingIcon {
+                visibility: visible;
+            }
+        </style>
+    </head>
+    <body>
+        <%- include("./partials/nav") %>
+        <div id="chat">
+            <div id="messages">
+                <img
+                    src="<%= PROXY_URL %>/assets/images/loading.svg"
+                    class="loadingIcon"
+                    id="messageLoadingIcon"
+                />
+                <div style="display: none"></div>
+            </div>
+            <div id="inputHolder">
+                <div
+                    class="fakeTextInput"
+                    id="messageInput"
+                    contenteditable="true"
+                    placeholder="Send a message"
+                    onkeydown="textboxKeyDown(event);"
+                    onpaste="textboxPaste(event);"
+                ></div>
+            </div>
+        </div>
+
+        <script>
+            const loadingIcon = document.getElementById("messageLoadingIcon");
+            const socket = io("", {
+                query: "roomid=<%= room._id %>",
+                path: "<%= PROXY_URL %>/socket.io",
+            });
+            let gettingMessage = false;
+            const messagesHolder = document.getElementById("messages");
+            const messageInput = document.getElementById("messageInput");
+
+            function checkHoldingModifers(event) {
+                return event.ctrlKey || event.shiftKey || event.altKey;
+            }
+
+            window.addEventListener("keydown", (event) => {
+                if (!checkHoldingModifers(event)) {
+                    messageInput.focus();
+                }
+            });
+
+            function textboxPaste(event) {
+                // remove formatting from paste
+                event.preventDefault();
+                const text = event.clipboardData.getData("text/plain");
+                document.execCommand("insertText", false, text);
+            }
+
+            function textboxKeyDown(event) {
+                if (event.key == "Enter" && !checkHoldingModifers(event)) {
+                    let message = messageInput.innerHTML;
+                    message = message
+                        .replace(/&lt;/g, "<")
+                        .replace(/&gt;/g, ">")
+                        .replace(/&amp;/g, "&");
+
+                    sendMessage(message);
+                    event.preventDefault();
+                }
+            }
+
+            function sendMessage(messageText) {
+                // removes all the whitespace at the start and end of message
+                messageText = messageText.replace(/(^( |&nbsp;|<br>)+)|(( |&nbsp;|<br>)+$)/g, "");
+                if (messageText.length >= 1 && messageText.length <= 1000) {
+                    socket.emit("SendMessage", messageText);
+                    messageInput.innerHTML = "";
+                }
+            }
+
+            // socket.on("disconnect", () => (location.href = "/"));
+
+            socket.on("RecieveMessage", (messageData) => {
+                const shouldScrollToBottom =
+                    messagesHolder.scrollHeight -
+                        messagesHolder.clientHeight -
+                        messagesHolder.scrollTop <
+                    10;
+                messagesHolder.appendChild(createMessageElement(messageData));
+                if (shouldScrollToBottom) {
+                    messagesHolder.scrollTop = messagesHolder.scrollHeight;
+                }
+            });
+
+            messagesHolder.addEventListener("scroll", () => {
+                if (messagesHolder.scrollTop < 10) {
+                    getMore();
+                }
+            });
+
+            function getMore() {
+                if (!gettingMessage) {
+                    const oldScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight;
+                    gettingMessage = true; // so no duplicate messages
+
+                    socket.emit("GetMore", oldestMessageIndex.toString(), (messages) => {
+                        // insert messages before loading icon
+                        messages
+                            .reverse()
+                            .forEach((message) =>
+                                messagesHolder.insertBefore(
+                                    createMessageElement(message),
+                                    messagesHolder.children[1]
+                                )
+                            );
+                        oldestMessageIndex -= messages.length;
+
+                        // calculate scroll
+                        const newScroll = messagesHolder.scrollHeight - messagesHolder.clientHeight;
+                        messagesHolder.scrollTop = newScroll - oldScroll;
+
+                        // if no more messages display start of chat text and remove loading icon
+                        if (messages.length < 30) {
+                            const statusText = document.createElement("p");
+                            statusText.classList.add("statusText");
+                            statusText.textContent = "You reached the beginning of the chat";
+                            statusText.style.textAlign = "center";
+
+                            messagesHolder.removeChild(loadingIcon);
+                            messagesHolder.insertBefore(statusText, messagesHolder.children[0]);
+                            return;
+                        }
+
+                        // no duplicate messages
+                        gettingMessage = false;
+                    });
+                }
+            }
+
+            function createMessageElement(messageData) {
+                const { displayname, username, message, userid } = messageData;
+
+                const messageDiv = document.createElement("div");
+                messageDiv.classList.add("message");
+
+                const img = document.createElement("img");
+                img.classList.add("usericon");
+                img.setAttribute("draggable", "false");
+                img.setAttribute("src", `<%= PROXY_URL %>/assets/usercontent/${userid}/photo.png`);
+                img.setAttribute("title", "@" + username);
+                img.onclick = () => {
+                    const shouldDelete = confirm("Delete the message?");
+                    if (shouldDelete) {
+                        socket.emit("DeleteMessage", messageData._id);
+                        messagesHolder.removeChild(messageDiv);
+                    }
+                };
+
+                const messageText = document.createElement("p");
+                messageText.classList.add("messagetext");
+                messageText.innerHTML = message;
+
+                const displayNameText = document.createElement("p");
+                displayNameText.classList.add("displayname");
+                displayNameText.innerHTML = displayname;
+
+                messageDiv.appendChild(img);
+                messageDiv.appendChild(displayNameText);
+                messageDiv.appendChild(messageText);
+                return messageDiv;
+            }
+
+            let oldestMessageIndex = parseInt("<%- messagesCount %>");
+
+            // create the last 10 messages
+            getMore();
+        </script>
+    </body>
 </html>

@@ -161,6 +161,7 @@ router.put("/displayname", async (req, res) => {
             { $set: { displayname: data.displayname } }
         );
 
+        req.session.user.displayname = data.displayname;
         res.json({ success: true });
     } catch (err) {
         console.log(err);
