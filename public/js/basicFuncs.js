@@ -1,6 +1,14 @@
-async function fetchAndHandle(url, textBoxesId, loadingIcon, redirect, method = "POST") {
+async function fetchAndHandle(
+  url,
+  textBoxesId,
+  loadingIcon,
+  redirect,
+  method = "POST"
+) {
   const formatedData = {};
-  textBoxesId.forEach((id) => (formatedData[id] = document.getElementById(id).value));
+  textBoxesId.forEach(
+    (id) => (formatedData[id] = document.getElementById(id).value)
+  );
 
   const options = {
     method: method,
@@ -34,12 +42,12 @@ async function handleErrors(response, textBoxesId) {
     });
 
     data.errors.forEach((error) => {
-      const whichErrorElement = document.getElementById(error.param);
+      const whichErrorElement = document.getElementById(error.property);
       whichErrorElement.style.backgroundColor = "#fc9090";
 
       const tooltip = document.createElement("div");
       tooltip.classList.add("tooltip");
-      tooltip.textContent = error.msg;
+      tooltip.textContent = error.message;
       whichErrorElement.parentElement.appendChild(tooltip);
     });
 

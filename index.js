@@ -14,8 +14,8 @@ const app = (module.exports.app = express());
 const server = require("http").createServer(app);
 const io = (module.exports.io = require("socket.io")(server));
 const options = require("./app/options");
-const usersController = require("./app/controller/user/main");
-const roomController = require("./app/controller/room/main");
+const usersController = require("./app/controller/user/user.js");
+const roomController = require("./app/controller/room/room.js");
 
 // EXPRESS MIDDLEWARES
 app.set("view engine", "ejs");
@@ -45,14 +45,17 @@ app.use(usersController.router);
 app.use(roomController.router);
 
 // MAIN ENDPOINTS
-app.get("/", (req, res) => res.render("home"));
+app.get("/", (_req, res) => res.render("home"));
 
 // NOT FOUND
 app.use((req, res) => {
   res.status(404);
-  if (req.path.startsWith("/assets")) return res.send(`Asset not found. Go back to <a href='/${global.PROXY_URL}'>homepage</a>`);
+  if (req.path.startsWith("/assets"))
+    return res.send(
+      `Asset not found. Go back to <a href='${global.PROXY_URL}'>homepage</a>`
+    );
   if (req.path.startsWith("/api")) return res.send("-1");
   res.render("404");
 });
 
-server.listen(PORT, () => console.log("Server running..."));
+server.listen(PORT, () => console.log("Server running on port " + PORT));

@@ -1,44 +1,44 @@
 {
-  "name": "chat-box",
-  "version": "1.0.0",
-  "description": "Simple Chatbox built in node",
-  "main": "index.js",
-  "scripts": {
-    "start": "sudo node index.js",
-    "reset": "sudo rm -r databases/; sudo rm -r public/usercontent/!(default)"
-  },
-  "keywords": [
-    "chat",
-    "node",
-    "html",
-    "express",
-    "socketio"
-  ],
-  "author": "Calbabreaker",
-  "license": "MIT",
-  "dependencies": {
-    "argon2": "^0.27.1",
-    "compression": "^1.7.4",
-    "connect-redis": "^5.1.0",
-    "dotenv": "^8.2.0",
-    "ejs": "^3.1.6",
-    "express": "^4.17.1",
-    "express-fileupload": "^1.2.1",
-    "express-session": "^1.17.1",
-    "fs-extra": "^9.1.0",
-    "http": "0.0.1-security",
-    "nedb": "^1.8.0",
-    "redis": "^3.0.2",
-    "sharp": "^0.27.2",
-    "socket.io": "^4.0.0",
-    "validator": "^13.5.2"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Calbabreaker/chat-box.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Calbabreaker/chat-box/issues"
-  },
-  "homepage": "https://github.com/Calbabreaker/chat-box#readme"
+    "name": "chat-box",
+    "version": "1.0.0",
+    "description": "Simple Chatbox built in node",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "keywords": [
+        "chat",
+        "node",
+        "html",
+        "express",
+        "socketio"
+    ],
+    "author": "Calbabreaker",
+    "license": "MIT",
+    "dependencies": {
+        "argon2": "^0.27.1",
+        "compression": "^1.7.4",
+        "connect-redis": "^5.1.0",
+        "dotenv": "^8.2.0",
+        "ejs": "^3.1.6",
+        "express": "^4.17.1",
+        "express-fileupload": "^1.2.1",
+        "express-session": "^1.17.1",
+        "fs-extra": "^9.1.0",
+        "http": "0.0.1-security",
+        "nedb": "^1.8.0",
+        "redis": "^3.0.2",
+        "sharp": "^0.27.2",
+        "socket.io": "^4.0.0",
+        "validation-chainer": "^1.1.2",
+        "validator": "^13.5.2"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Calbabreaker/chat-box.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Calbabreaker/chat-box/issues"
+    },
+    "homepage": "https://github.com/Calbabreaker/chat-box#readme"
 }

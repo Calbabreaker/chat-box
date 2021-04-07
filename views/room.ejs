@@ -162,10 +162,11 @@
       }
 
       function sendMessage(messageText) {
+        // removes all the whitespace at the start and end of message
         messageText = messageText.replace(
           /(^( |&nbsp;|<br>)+)|(( |&nbsp;|<br>)+$)/g,
           ""
-        ); // removes all the whitespace at the start and end of message
+        );
         if (messageText.length >= 1 && messageText.length <= 1000) {
           socket.emit("SendMessage", messageText);
           messageInput.innerHTML = "";
