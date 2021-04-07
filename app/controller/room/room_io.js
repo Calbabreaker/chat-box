@@ -46,11 +46,11 @@ io.on("connection", async (socket) => {
 
         socket.on("DeleteMessage", async (id) => {
             try {
-                const check = messagesDatabases[connectedRoom._id].checkProperty({ _id: id });
+                const check = await messagesDatabases[connectedRoom._id].checkProperty({ _id: id });
                 const user = socket.request.session.user;
                 if (!check.found || check.doc.userid !== user._id) throw "Invalid id";
 
-                messagesDatabases[connectedRoom._id].removeByProperty({ _id: id });
+                await messagesDatabases[connectedRoom._id].removeByProperty({ _id: id });
             } catch (err) {
                 console.log(err);
                 socket.disconnect();
