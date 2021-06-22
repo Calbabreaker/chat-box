@@ -10,15 +10,15 @@ Working demo on the [Website](https://naltonsoftware.com/chatbox).
 
 If you want to use this, then give credit.
 
-First clone and download dependencies:
+First clone and download dependencies: (yarn is used)
 
 ```sh
 git clone https://github.com/Calbabreaker/chat-box.git
 cd chat-box
-npm install
+yarn 
 ```
 
-Then you need to get a redis-server (linux):
+Then you need to get a redis-server (Ubuntu):
 
 ```sh
 sudo apt update
@@ -34,7 +34,7 @@ redis-server &
 Start the node server:
 
 ```sh
-npm start
+yarn start
 ```
 
 For more detail instructions please see this [post](https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-redis-on-ubuntu-18-04) (for redis) and this [post](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-16-04) (for nodejs).
