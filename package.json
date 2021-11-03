@@ -31,7 +31,7 @@
         "sharp": "^0.28.3",
         "socket.io": "^4.1.2",
         "validation-chainer": "^1.1.2",
-        "validator": "^13.6.0"
+        "validator": "^13.7.0"
     },
     "repository": {
         "type": "git",
